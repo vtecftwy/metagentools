@@ -1,0 +1,258 @@
+{
+    "GCT": {
+        "amino acid": "Ala, A",
+        "amino acid long": "Alanine"
+    },
+    "GCC": {
+        "amino acid": "Ala, A",
+        "amino acid long": "Alanine"
+    },
+    "GCA": {
+        "amino acid": "Ala, A",
+        "amino acid long": "Alanine"
+    },
+    "GCG": {
+        "amino acid": "Ala, A",
+        "amino acid long": "Alanine"
+    },
+    "CGT": {
+        "amino acid": "Arg, R",
+        "amino acid long": "Arginine"
+    },
+    "CGC": {
+        "amino acid": "Arg, R",
+        "amino acid long": "Arginine"
+    },
+    "CGA": {
+        "amino acid": "Arg, R",
+        "amino acid long": "Arginine"
+    },
+    "CGG": {
+        "amino acid": "Arg, R",
+        "amino acid long": "Arginine"
+    },
+    "AGA": {
+        "amino acid": "Arg, R",
+        "amino acid long": "Arginine"
+    },
+    "AGG": {
+        "amino acid": "Arg, R",
+        "amino acid long": "Arginine"
+    },
+    "AAT": {
+        "amino acid": "Asn, B",
+        "amino acid long": "Asn or Asp, B"
+    },
+    "AAC": {
+        "amino acid": "Asn, B",
+        "amino acid long": "Asn or Asp, B"
+    },
+    "GAT": {
+        "amino acid": "Asp, D",
+        "amino acid long": "Aspartic acid"
+    },
+    "GAC": {
+        "amino acid": "Asp, D",
+        "amino acid long": "Aspartic acid"
+    },
+    "TGT": {
+        "amino acid": "Cys, C",
+        "amino acid long": "Cysteine"
+    },
+    "TGC": {
+        "amino acid": "Cys, C",
+        "amino acid long": "Cysteine"
+    },
+    "CAA": {
+        "amino acid": "Gln, Z",
+        "amino acid long": "Glu or Glu, Z"
+    },
+    "CAG": {
+        "amino acid": "Gln, Z",
+        "amino acid long": "Glu or Glu, Z"
+    },
+    "GAA": {
+        "amino acid": "Gln, Z",
+        "amino acid long": "Glu or Glu, Z"
+    },
+    "GAG": {
+        "amino acid": "Glu, E",
+        "amino acid long": "Glutamic acid"
+    },
+    "GAG ": {
+        "amino acid": "Gln, Z",
+        "amino acid long": "Glu or Glu, Z"
+    },
+    "GGT": {
+        "amino acid": "Gly, G",
+        "amino acid long": "Gly, G"
+    },
+    "GGC": {
+        "amino acid": "Gly, G",
+        "amino acid long": "Gly, G"
+    },
+    "GGA": {
+        "amino acid": "Gly, G",
+        "amino acid long": "Gly, G"
+    },
+    "GGG": {
+        "amino acid": "Gly, G",
+        "amino acid long": "Gly, G"
+    },
+    "CAT": {
+        "amino acid": "His, H",
+        "amino acid long": "Histidine"
+    },
+    "CAC": {
+        "amino acid": "His, H",
+        "amino acid long": "Histidine"
+    },
+    "ATT": {
+        "amino acid": "Ile, I",
+        "amino acid long": "Isoleucine"
+    },
+    "ATC": {
+        "amino acid": "Ile, I",
+        "amino acid long": "Isoleucine"
+    },
+    "ATA": {
+        "amino acid": "Ile, I",
+        "amino acid long": "Isoleucine"
+    },
+    "CTT": {
+        "amino acid": "Leu, L",
+        "amino acid long": "Leucine"
+    },
+    "CTC": {
+        "amino acid": "Leu, L",
+        "amino acid long": "Leucine"
+    },
+    "CTA": {
+        "amino acid": "Leu, L",
+        "amino acid long": "Leucine"
+    },
+    "CTG; TTA": {
+        "amino acid": "Leu, L",
+        "amino acid long": "Leucine"
+    },
+    "TTG": {
+        "amino acid": "Leu, L",
+        "amino acid long": "Leucine"
+    },
+    "AAA": {
+        "amino acid": "Lys, K",
+        "amino acid long": "Lysine"
+    },
+    "AAG": {
+        "amino acid": "Lys, K",
+        "amino acid long": "Lysine"
+    },
+    "ATG": {
+        "amino acid": "START",
+        "amino acid long": "START"
+    },
+    "TTT": {
+        "amino acid": "Phe, F",
+        "amino acid long": "Phenylalanine"
+    },
+    "TTC": {
+        "amino acid": "Phe, F",
+        "amino acid long": "Phenylalanine"
+    },
+    "CCT": {
+        "amino acid": "Pro, P",
+        "amino acid long": "Proline"
+    },
+    "CCC": {
+        "amino acid": "Pro, P",
+        "amino acid long": "Proline"
+    },
+    "CCA": {
+        "amino acid": "Pro, P",
+        "amino acid long": "Proline"
+    },
+    "CCG": {
+        "amino acid": "Pro, P",
+        "amino acid long": "Proline"
+    },
+    "TCT": {
+        "amino acid": "Ser, S",
+        "amino acid long": "Serine"
+    },
+    "TCC": {
+        "amino acid": "Ser, S",
+        "amino acid long": "Serine"
+    },
+    "TCA": {
+        "amino acid": "Ser, S",
+        "amino acid long": "Serine"
+    },
+    "TCG": {
+        "amino acid": "Ser, S",
+        "amino acid long": "Serine"
+    },
+    "AGT": {
+        "amino acid": "Ser, S",
+        "amino acid long": "Serine"
+    },
+    "AGC": {
+        "amino acid": "Ser, S",
+        "amino acid long": "Serine"
+    },
+    "ACT": {
+        "amino acid": "Thr, T",
+        "amino acid long": "Threonine"
+    },
+    "ACC": {
+        "amino acid": "Thr, T",
+        "amino acid long": "Threonine"
+    },
+    "ACA": {
+        "amino acid": "Thr, T",
+        "amino acid long": "Threonine"
+    },
+    "ACG": {
+        "amino acid": "Thr, T",
+        "amino acid long": "Threonine"
+    },
+    "TGG": {
+        "amino acid": "Trp, W",
+        "amino acid long": "Tryptophan"
+    },
+    "TAT": {
+        "amino acid": "Tyr, Y",
+        "amino acid long": "Tyrosine"
+    },
+    "TAC": {
+        "amino acid": "Tyr, Y",
+        "amino acid long": "Tyrosine"
+    },
+    "GTT": {
+        "amino acid": "Val, V",
+        "amino acid long": "Valine"
+    },
+    "GTC": {
+        "amino acid": "Val, V",
+        "amino acid long": "Valine"
+    },
+    "GTA": {
+        "amino acid": "Val, V",
+        "amino acid long": "Valine"
+    },
+    "GTG": {
+        "amino acid": "Val, V",
+        "amino acid long": "Valine"
+    },
+    "TAA": {
+        "amino acid": "STOP",
+        "amino acid long": "STOP"
+    },
+    "TGA": {
+        "amino acid": "STOP",
+        "amino acid long": "STOP"
+    },
+    "TAG": {
+        "amino acid": "STOP",
+        "amino acid long": "STOP"
+    }
+}

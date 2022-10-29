@@ -1,0 +1,194 @@
+{
+    "Ala, A": {
+        "amino acid long": "Alanine",
+        "codons": [
+            "GCT",
+            "GCC",
+            "GCA",
+            "GCG"
+        ]
+    },
+    "Arg, R": {
+        "amino acid long": "Arginine",
+        "codons": [
+            "CGT",
+            "CGC",
+            "CGA",
+            "CGG",
+            "AGA",
+            "AGG"
+        ]
+    },
+    "Asn, N": {
+        "amino acid long": "Asparagine",
+        "codons": [
+            "AAT",
+            "AAC"
+        ]
+    },
+    "Asn, B": {
+        "amino acid long": "Asn or Asp, B",
+        "codons": [
+            "AAT",
+            "AAC",
+            "GAT",
+            "GAC"
+        ]
+    },
+    "Asp, D": {
+        "amino acid long": "Aspartic acid",
+        "codons": [
+            "GAT",
+            "GAC"
+        ]
+    },
+    "Cys, C": {
+        "amino acid long": "Cysteine",
+        "codons": [
+            "TGT",
+            "TGC"
+        ]
+    },
+    "Gln, Q": {
+        "amino acid long": "Glutamine",
+        "codons": [
+            "CAA",
+            "CAG"
+        ]
+    },
+    "Glu, E": {
+        "amino acid long": "Glutamic acid",
+        "codons": [
+            "GAA",
+            "GAG"
+        ]
+    },
+    "Gln, Z": {
+        "amino acid long": "Glu or Glu, Z",
+        "codons": [
+            "CAA",
+            "CAG",
+            "GAA",
+            "GAG "
+        ]
+    },
+    "Gly, G": {
+        "amino acid long": "Gly, G",
+        "codons": [
+            "GGT",
+            "GGC",
+            "GGA",
+            "GGG"
+        ]
+    },
+    "His, H": {
+        "amino acid long": "Histidine",
+        "codons": [
+            "CAT",
+            "CAC"
+        ]
+    },
+    "Ile, I": {
+        "amino acid long": "Isoleucine",
+        "codons": [
+            "ATT",
+            "ATC",
+            "ATA"
+        ]
+    },
+    "Leu, L": {
+        "amino acid long": "Leucine",
+        "codons": [
+            "CTT",
+            "CTC",
+            "CTA",
+            "CTG; TTA",
+            "TTG"
+        ]
+    },
+    "Lys, K": {
+        "amino acid long": "Lysine",
+        "codons": [
+            "AAA",
+            "AAG"
+        ]
+    },
+    "Met, M": {
+        "amino acid long": "Methionine",
+        "codons": [
+            "ATG"
+        ]
+    },
+    "Phe, F": {
+        "amino acid long": "Phenylalanine",
+        "codons": [
+            "TTT",
+            "TTC"
+        ]
+    },
+    "Pro, P": {
+        "amino acid long": "Proline",
+        "codons": [
+            "CCT",
+            "CCC",
+            "CCA",
+            "CCG"
+        ]
+    },
+    "Ser, S": {
+        "amino acid long": "Serine",
+        "codons": [
+            "TCT",
+            "TCC",
+            "TCA",
+            "TCG",
+            "AGT",
+            "AGC"
+        ]
+    },
+    "Thr, T": {
+        "amino acid long": "Threonine",
+        "codons": [
+            "ACT",
+            "ACC",
+            "ACA",
+            "ACG"
+        ]
+    },
+    "Trp, W": {
+        "amino acid long": "Tryptophan",
+        "codons": [
+            "TGG"
+        ]
+    },
+    "Tyr, Y": {
+        "amino acid long": "Tyrosine",
+        "codons": [
+            "TAT",
+            "TAC"
+        ]
+    },
+    "Val, V": {
+        "amino acid long": "Valine",
+        "codons": [
+            "GTT",
+            "GTC",
+            "GTA",
+            "GTG"
+        ]
+    },
+    "START": {
+        "amino acid long": "START",
+        "codons": [
+            "ATG"
+        ]
+    },
+    "STOP": {
+        "amino acid long": "STOP",
+        "codons": [
+            "TAA",
+            "TGA",
+            "TAG"
+        ]
+    }
+}

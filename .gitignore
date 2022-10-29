@@ -150,13 +150,16 @@ checklink/cookies.txt
 # Quarto
 .quarto
 
-# data and other resources
-data/
+# resources
 resources/
 
 # legacy code
 legacy/
 tests/
+
+# data in sub-directories
+# all files in the top level of data/ will be tracked
+data/*/
 
 # WIP
 wip.*.ipynb
