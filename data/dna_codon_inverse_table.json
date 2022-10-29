@@ -26,15 +26,6 @@
             "AAC"
         ]
     },
-    "Asn, B": {
-        "amino acid long": "Asn or Asp, B",
-        "codons": [
-            "AAT",
-            "AAC",
-            "GAT",
-            "GAC"
-        ]
-    },
     "Asp, D": {
         "amino acid long": "Aspartic acid",
         "codons": [
@@ -63,17 +54,8 @@
             "GAG"
         ]
     },
-    "Gln, Z": {
-        "amino acid long": "Glu or Glu, Z",
-        "codons": [
-            "CAA",
-            "CAG",
-            "GAA",
-            "GAG "
-        ]
-    },
     "Gly, G": {
-        "amino acid long": "Gly, G",
+        "amino acid long": "Glycine",
         "codons": [
             "GGT",
             "GGC",

@@ -5,4 +5,4 @@ d = { 'settings': { 'branch': 'main',
                 'doc_host': 'https://vtecftwy.github.io',
                 'git_url': 'https://github.com/vtecftwy/metagentools',
                 'lib_path': 'metagentools'},
-  'syms': {}}
+  'syms': {'metagentools.cnn_virus.all': {}, 'metagentools.core': {'metagentools.core.foo': ('core.html#foo', 'metagentools/core.py')}}}
