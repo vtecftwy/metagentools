@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "core",
+    "section": "",
+    "text": "source\n\nfoo\n\n foo (a:int|float=0, b:int|float=0)\n\nExample of a function not that useful\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\na\nint | float\n0\nfirst value\n\n\nb\nint | float\n0\nsecond value\n\n\nReturns\nint | float\n\nsum of both values\n\n\n\n\nIllustration\n\nfoo(1, 2)\n\n3\n\n\n\n\nOther Examples\n\nfoo(3)\n\n3\n\n\n\nfoo()\n\n0"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "metagentools",
+    "section": "",
+    "text": "Check again later when some code will be posted"
+  }
+]
