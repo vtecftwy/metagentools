@@ -157,3 +157,6 @@ resources/
 # legacy code
 legacy/
 tests/
+
+# WIP
+wip.*.ipynb
