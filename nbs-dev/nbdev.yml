@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "metagentools"
+  site-url: "https://vtecftwy.github.io/metagentools"
+  description: "Set of tools used for metagenomics research project"
+  repo-branch: main
+  repo-url: "https://github.com/vtecftwy/metagentools"
