@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['foo']
 
-# %% ../nbs-dev/00_core.ipynb 3
+# %% ../nbs-dev/00_core.ipynb 4
 def foo(a:int|float = 0,   # first value
         b:int|float = 0    # second value
        )->int|float:   # sum of both values

@@ -157,9 +157,15 @@ resources/
 legacy/
 tests/
 
-# data in sub-directories
+# wandb local directories
+*/wandb/*
+
+# data in sub-directories of data/
 # all files in the top level of data/ will be tracked
 data/*/
 
 # WIP
 wip.*.ipynb
+
+# Confidential informations
+secrets/
