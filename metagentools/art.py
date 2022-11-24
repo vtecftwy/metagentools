@@ -20,7 +20,7 @@ def _run(args: List[str], shell: bool=False):
     print('return code: ',p.returncode, '\n')
     print(str(p.stdout, 'utf-8'))
 
-# %% ../nbs-dev/02_art.ipynb 11
+# %% ../nbs-dev/02_art.ipynb 9
 def _validate_path(p:str|Path) -> Path:
     """checks that path is a string or a Path, and returns a Path"""
     if isinstance(p, str): 
@@ -29,15 +29,15 @@ def _validate_path(p:str|Path) -> Path:
         raise TypeError(f"a path must be a string or a Path, not a {type(p)}")
     return p
 
-# %% ../nbs-dev/02_art.ipynb 12
+# %% ../nbs-dev/02_art.ipynb 10
 class ArtIllumina:
     """Simulate sequence reads with art_illumina"""
 
     def __init__(
         self, 
-        path2app: str|Path, 
-        input_dir: str|Path, 
-        output_dir: Optional(str|Path)=None
+        path2app: str|Path,           # path to the art_illumina application on the system
+        input_dir: str|Path,          # path to the dir where input files are
+        output_dir: str|Path=None     # path to the dir where to save output files, if different from input_dir
         ):
         """Initialize the art_illumina instance"""
 
@@ -69,14 +69,14 @@ class ArtIllumina:
 
     def sim_reads(
         self,
-        input_file: str,
-        output_seed: str,
-        sim_type='paired',
-        read_length=150,
-        fold=10,
-        mean_read=None,
-        std_read=None,
-        ss='HS25',
+        input_file: str,     # name of the fasta file to use as input
+        output_seed: str,    # seed to use for the output files
+        sim_type='paired',   # type of read simmulation: 'single' or 'paired'
+        read_length=150,     # length of the read in bp
+        fold=10,             # fold
+        mean_read=None,      # mean length of the read for paired reads
+        std_read=None,       # std of the read length, for paired reads
+        ss='HS25',           # quality profile to use for simulation
         ):
         """Simulates reads with art_illumina"""
         
