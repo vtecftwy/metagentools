@@ -32,7 +32,7 @@ def _validate_path(p:str|Path) -> Path:
 
 # %% ../nbs-dev/02_art.ipynb 7
 class ArtIllumina:
-    """Simulate sequence reads with art_illumina"""
+    """Class to handle all aspects of simulating sequencing with art_illumina"""
 
     QUALITY_PROFILES = {
         'GA1': 'GenomeAnalyzer I (36bp,44bp)', 'GA2': 'GenomeAnalyzer II (50bp, 75bp)',
