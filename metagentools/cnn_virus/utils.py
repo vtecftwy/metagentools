@@ -9,7 +9,7 @@ from fastcore.utils import run
 from pathlib import Path
 
 # %% ../../nbs-dev/03_cnn_virus_utils.ipynb 5
-def setup_nb(ci=False) -> tuple:      # colab, path to data root, path to data
+def setup_nb(_dev=False) -> tuple:      # colab, path to data root, path to data
     """Sets up the colab or the local environment and paths"""
     try:
         from google.colab import drive
@@ -30,7 +30,7 @@ def setup_nb(ci=False) -> tuple:      # colab, path to data root, path to data
             import metagentools
         except ModuleNotFoundError:
             raise ModuleNotFoundError('Cannot find package metagentools. Make sure you pip -e install it in your environment')
-        if ci:
+        if _dev:
             p2dataroot = Path('data_dev')
             p2data = Path('data_dev)')
         else:
