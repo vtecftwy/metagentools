@@ -5,10 +5,6 @@ __all__ = ['create_model_original']
 
 # %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 2
 # Imports all dependencies
-import numpy as np
-import pandas as pd
-import os
-import random
 import tensorflow as tf
 import tensorflow.keras
 
@@ -20,7 +16,7 @@ from tensorflow.keras.layers import MaxPooling1D, Concatenate
 from tensorflow.keras.models import Sequential, Model, load_model
 
 # %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 6
-def create_model_original():
+def create_model_original() -> tf.keras.Model: # new instance of an original paper architecture
     """Build a CNN model as per CNN Virus paper"""
 
     print("Creating CNN Model (Original)")

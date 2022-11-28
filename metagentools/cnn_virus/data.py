@@ -8,8 +8,10 @@ __all__ = ['strings_to_tensors']
 import tensorflow as tf
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 5
-def strings_to_tensors(b):
-    """Convert batch of strings into three tensors: (x_seqs, (y_labels, y_pos))"""
+def strings_to_tensors(
+    b: tf.Tensor        # batch of strings 
+    ):
+    """Function converting a batch of bp strings into three tensors: (x_seqs, (y_labels, y_pos))"""
     
     # Split the string in three : returns a ragged tensor which needs to be converted into a normal tensor using .to_tensor()
     t = tf.strings.split(b, '\t').to_tensor(default_value = '', shape=[None, 3])

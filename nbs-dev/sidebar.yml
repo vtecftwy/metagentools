@@ -7,3 +7,4 @@ website:
       - 02_art.ipynb
       - 03_cnn_virus_architecture.ipynb
       - 03_cnn_virus_data.ipynb
+      - 03_cnn_virus_utils.ipynb
