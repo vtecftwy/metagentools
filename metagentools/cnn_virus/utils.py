@@ -32,7 +32,7 @@ def setup_nb(_dev=False) -> tuple:      # colab, path to data root, path to data
             raise ModuleNotFoundError('Cannot find package metagentools. Make sure you pip -e install it in your environment')
         if _dev:
             p2dataroot = Path('data_dev')
-            p2data = Path('data_dev)')
+            p2data = Path('data_dev')
         else:
             p2dataroot = Path('../data').resolve()
             p2data =  p2dataroot / 'CNN_Virus_data'
