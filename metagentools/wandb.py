@@ -155,7 +155,7 @@ def project_artifacts(
     latest = artifacts_df.loc[row_filter, cols2show].sort_values(by='created').reset_index(drop=True)
     return latest, [t.name for t in at_types]
 
-# %% ../nbs-dev/01_wandb.ipynb 50
+# %% ../nbs-dev/01_wandb.ipynb 48
 def run_name_exists(
     run_name: str,      # name of the run to check 
     entity: str,        # name of the entity from which to retrieve the artifacts 
@@ -167,7 +167,7 @@ def run_name_exists(
     run_matches = [run_name == r.name for r in runs]
     return any(run_matches)
 
-# %% ../nbs-dev/01_wandb.ipynb 53
+# %% ../nbs-dev/01_wandb.ipynb 51
 def unique_run_name(
     name_seed:str     # Run name to which a timestamp will be added
     ):

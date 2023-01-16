@@ -8,9 +8,9 @@ __all__ = ['setup_nb']
 from fastcore.utils import run
 from pathlib import Path
 
-# %% ../../nbs-dev/03_cnn_virus_utils.ipynb 5
-def setup_nb(_dev=False) -> tuple:      # colab, path to data root, path to data
-    """Sets up the colab or the local environment and paths"""
+# %% ../../nbs-dev/03_cnn_virus_utils.ipynb 4
+def setup_nb(_dev=False) -> tuple:         # (colab, path to data root, path to data)
+    """Sets up colab or local environment and corresponding paths to data root directory and cnn virus data"""
     try:
         from google.colab import drive
         ON_COLAB = True
@@ -18,7 +18,7 @@ def setup_nb(_dev=False) -> tuple:      # colab, path to data root, path to data
         print('Installing project code')
         cmd = "pip install -U git+https://github.com/vtecftwy/metagentools.git@main"
         run(cmd)
-        # Assumes shared gdrive dir accessible through shortcut `Metagenomics` under the root of gdrive.     
+        # Assumes shared gdrive dir is accessible through shortcut `Metagenomics` under the gdrive root.
         drive.mount('/content/gdrive')
         p2dataroot = Path('/content/gdrive/MyDrive/Metagenonics')
         p2data =  p2dataroot / 'CNN_Virus_data'
@@ -40,4 +40,3 @@ def setup_nb(_dev=False) -> tuple:      # colab, path to data root, path to data
     if not p2dataroot.is_dir(): raise ValueError(f"{p2dataroot} is not a directory")
     if not p2data.is_dir(): raise ValueError(f"{p2data} is not a directory")
     return ON_COLAB, p2dataroot, p2data
-
