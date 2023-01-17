@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Tuple
 
-# %% ../nbs-dev/01_wandb.ipynb 8
+# %% ../nbs-dev/01_wandb.ipynb 9
 def login_nb(
     nb_file: str|Path=None   # name of the notebook (str) or path to the notebook (Path)
     ):
@@ -40,26 +40,27 @@ def login_nb(
 
     wandb.login(relogin=False)    
 
-# %% ../nbs-dev/01_wandb.ipynb 19
+# %% ../nbs-dev/01_wandb.ipynb 20
 class WandbRun():
     """Manages a run with WandB and all registered actions performed while the run is active. Close run with .finish()"""
     
     def __init__(
         self,
-        entity: str='', # the user or organization under which the run will be logged. Default: `metagenomics_sh` 
-        project: str='', # the name of the WandB project under which the run will be logged 
-        run_name: str='', # unique name for the run,
-        job_type: str='', # e.g.: `load_datasets`, `train_exp`, ... 
-        notes: str='', # (optional) any text description or additional information to store with the run 
-        testing: bool=False # (optional) If True, will not create a run on WandB. Use for local testing
+        entity: str='',             # user or organization under which the run will be logged. Default: `metagenomics_sh` 
+        project: str='',            # name of the WandB project under which the run will be logged 
+        run_name: str='',           # unique name for the run,
+        job_type: str='',           # e.g.: `load_datasets`, `train_exp`, ... 
+        notes: str='',              # any text description or additional information to store with the run 
+        logs_dir: str|Path= None,   # default is project_root/wandb-logs if None, or uses the passed Path
+        testing: bool=False         # (optional) If True, will not create a run on WandB. Use for local testing
         ) -> wandb.sdk.wandb_run.Run:
         """Validates metadata inputs and initialize the wandb run, unless testing is set to True"""
         
         # Validate inputs
-        for k,v in [key_val for key_val in locals().items() if key_val[0] not in ['self', 'notes', 'testing']]:
+        for k,v in [key_val for key_val in locals().items() if key_val[0] not in ['self', 'notes', 'testing', 'logs_dir']]:
             if v == '': raise ValueError(f"{k} may not be an empty string. Please provide a value")
 
-        for k,v in [key_val for key_val in locals().items() if key_val[0] not in ['self', 'testing']]:
+        for k,v in [key_val for key_val in locals().items() if key_val[0] not in ['self', 'testing', 'logs_dir']]:
             if not isinstance(v, str): raise TypeError(f"{k} must be a string, not a {type(v)}")
 
         self.entity = entity
@@ -67,6 +68,15 @@ class WandbRun():
         self.run_name = run_name
         self.job_type = job_type
         self.notes = notes
+        
+        if logs_dir is None:
+            self.wandb_logs = self._get_wandb_logs_dir()
+        elif isinstance(logs_dir, str):
+            self.wandb_logs = Path(logs_dir)
+        elif isinstance(logs_dir, Path):
+            self.wandb_logs = logs_dir
+        else:
+            raise ValueError(f"logs_dir must be None, a str or a Path, not a {type(logs_dir)}")
         
         if not testing:
             self.run = wandb.init(
@@ -76,13 +86,20 @@ class WandbRun():
                 job_type=job_type, 
                 notes=notes, 
                 save_code=True,
-                dir= Path('../wandb-logs').resolve()
+                dir= self.wandb_logs
             )
-
 
     def finish(self):
         """End the run"""
         self.run.finish()
+    
+    @staticmethod
+    def _get_wandb_logs_dir():
+        cur_dir_parents = Path().absolute().parents
+        wandb_logs_dir = [p for p in cur_dir_parents if 'nbs' not in p.name][0] / 'wandb-logs'
+        if not wandb_logs_dir.is_dir():
+            raise ValueError(f"Cannot find the wandb-logs directory. Please specify the correct path ")
+        return wandb_logs_dir
         
     def upload_dataset(
         self, 
@@ -110,7 +127,7 @@ class WandbRun():
         
         return artifact
 
-# %% ../nbs-dev/01_wandb.ipynb 38
+# %% ../nbs-dev/01_wandb.ipynb 39
 def entity_projects(
     entity: str # name of the entity from which the projects will be retrieved
     ) -> wandb.apis.public.Projects : # Projects iterator
@@ -119,7 +136,7 @@ def entity_projects(
     projects = api.projects(entity=entity)
     return projects
 
-# %% ../nbs-dev/01_wandb.ipynb 42
+# %% ../nbs-dev/01_wandb.ipynb 43
 def get_project(
     entity: str,        # name of the entity from which the project will be retrieved 
     project_name:str,   # name of the project to retrieve
@@ -128,7 +145,7 @@ def get_project(
     api = wandb.Api()
     return api.from_path(f"{entity}/{project_name}")
 
-# %% ../nbs-dev/01_wandb.ipynb 45
+# %% ../nbs-dev/01_wandb.ipynb 46
 def print_entity_project_list(entity):
     """Print the name and url of all projects in entity"""
     projects = entity_projects(entity)
@@ -136,7 +153,7 @@ def print_entity_project_list(entity):
     for i, p in enumerate(projects):
         print(f" {i:2d}. {p.name:30s} (url: {p.url})")
 
-# %% ../nbs-dev/01_wandb.ipynb 47
+# %% ../nbs-dev/01_wandb.ipynb 48
 def project_artifacts(
     entity: str,                     # name of the entity from which to retrieve the artifacts 
     project_name: str,               # name of the project from which to retrieve the artifacts 
@@ -181,7 +198,7 @@ def project_artifacts(
     latest = artifacts_df.loc[row_filter, cols2show].sort_values(by='created').reset_index(drop=True)
     return latest, [t.name for t in at_types]
 
-# %% ../nbs-dev/01_wandb.ipynb 53
+# %% ../nbs-dev/01_wandb.ipynb 54
 def run_name_exists(
     run_name: str,      # name of the run to check 
     entity: str,        # name of the entity from which to retrieve the artifacts 
@@ -193,7 +210,7 @@ def run_name_exists(
     run_matches = [run_name == r.name for r in runs]
     return any(run_matches)
 
-# %% ../nbs-dev/01_wandb.ipynb 56
+# %% ../nbs-dev/01_wandb.ipynb 57
 def unique_run_name(
     name_seed:str     # Run name to which a timestamp will be added
     ):
