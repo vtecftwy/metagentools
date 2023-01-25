@@ -5,6 +5,7 @@ __all__ = ['ArtIllumina']
 
 # %% ../nbs-dev/02_art.ipynb 2
 # Imports all dependencies
+import os
 import subprocess
 import shlex
 
@@ -45,8 +46,8 @@ class ArtIllumina:
     def __init__(
         self, 
         path2app: str|Path,           # path to the art_illumina application on the system
-        input_dir: str|Path,          # path to the dir where input files are
-        output_dir: str|Path=None     # path to the dir where to save output files, if different from input_dir
+        input_dir: str|Path,          # path to dir where input files are
+        output_dir: str|Path=None     # path to dir where to save output files, if different from input_dir
         ):
         """Initialize the art_illumina instance"""
 
@@ -88,9 +89,9 @@ class ArtIllumina:
         ss: str='HS25',           # quality profile to use for simulation,
         overwrite: bool=False     # overwrite existing output files if true, raise error if false 
         ):
-        """Simulates reads with art_illumina"""
+        """Simulates reads with art_illumina. Output files saved in a separate directory"""
 
-        # validate input file and save is in instance
+        # validate input file and save in instance
         path2inputfile = self.input_dir / input_file
         if path2inputfile.is_file(): 
             self.last_input_file = path2inputfile
@@ -99,9 +100,11 @@ class ArtIllumina:
 
         # validate output seed and save in instance
         if not overwrite and len(list(self.output_dir.glob(f"{output_seed}*"))) > 0: 
-            raise ValueError(f"Existing output files starting with {output_seed}")
+            raise ValueError(f"Existing output directory starting with {output_seed}")
         else:
-            self.last_ouput_seed = output_seed
+            self.last_output_seed = output_seed
+            self.last_read_output_dir = self.output_dir/self.last_output_seed
+            os.makedirs(self.last_read_output_dir, exist_ok=True)
 
         # validate quality profile
         if ss not in list(self.QUALITY_PROFILES.keys()): 
@@ -119,7 +122,7 @@ class ArtIllumina:
             raise RuntimeError(f"{sim_type} in not a type or is not implemented yet")
 
         p2in = self.last_input_file.absolute()
-        p2out = (self.output_dir / output_seed).absolute()
+        p2out = (self.output_dir / self.last_output_seed / self.last_output_seed).absolute()
 
         cmd = f"{self.app.absolute()} -i {p2in} {params} -o {p2out}"
 
@@ -127,7 +130,7 @@ class ArtIllumina:
 
     def get_last_output_files(self):
         """Returns the path to all output files from last simulation"""
-        return [f for f in self.output_dir.iterdir() if self.last_ouput_seed in f.name]
+        return [f for f in self.last_read_output_dir.iterdir()]
 
     def list_last_output_files(self):
         """Prints a list of the last simulation's output files"""
@@ -137,11 +140,24 @@ class ArtIllumina:
     def list_all_input_files(self):
         for f in sorted(list(self.input_dir.iterdir())):
             print(f.name)
- 
-    def list_all_output_files(self):
-        for f in sorted(list(self.output_dir.iterdir())):
-            print(f.name)
 
+    def get_all_output_files(self):
+        """Return a dictionary with k as output file subdirectory and v as list of output files"""
+        all_output_files = {}
+        for d in sorted([p for p in self.output_dir.iterdir() if p.is_dir()]):
+            files = []
+            for f in d.iterdir():
+                files.append(f)
+            all_output_files[d.name] = files
+
+        return all_output_files
+
+    def list_all_output_files(self):
+        all_files = self.get_all_output_files()
+        for k, v in all_files.items():
+            print(k)
+            print('\n'.join([f"- {p.name}" for p in v]))
+        
     def print_last_output_file_excerpts(
         self, 
         suffix: str='fq',        # suffix of the files to explore: 'fq', 'aln', 'sam' 
