@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Tuple
 
-# %% ../nbs-dev/01_wandb.ipynb 9
+# %% ../nbs-dev/01_wandb.ipynb 8
 def login_nb(
     nb_file: str|Path=None   # name of the notebook (str) or path to the notebook (Path)
     ):
@@ -40,9 +40,9 @@ def login_nb(
 
     wandb.login(relogin=False)    
 
-# %% ../nbs-dev/01_wandb.ipynb 19
+# %% ../nbs-dev/01_wandb.ipynb 18
 class WandbRun():
-    """Manages WandB run and all logged actions performed while the run is active. Close run with .finish()"""
+    """Manages a WandB run and all logged actions performed while run is active. Close run with .finish()"""
     
     def __init__(
         self,
@@ -139,7 +139,7 @@ class WandbRun():
         
         return artifact
 
-# %% ../nbs-dev/01_wandb.ipynb 46
+# %% ../nbs-dev/01_wandb.ipynb 45
 def entity_projects(
     entity: str # name of the entity from which the projects will be retrieved
     ) -> wandb.apis.public.Projects : # Projects iterator
@@ -148,7 +148,7 @@ def entity_projects(
     projects = api.projects(entity=entity)
     return projects
 
-# %% ../nbs-dev/01_wandb.ipynb 49
+# %% ../nbs-dev/01_wandb.ipynb 48
 def get_project(
     entity: str,        # name of the entity from which the project will be retrieved 
     project_name:str,   # name of the project to retrieve
@@ -157,7 +157,7 @@ def get_project(
     api = wandb.Api()
     return api.from_path(f"{entity}/{project_name}")
 
-# %% ../nbs-dev/01_wandb.ipynb 51
+# %% ../nbs-dev/01_wandb.ipynb 50
 def print_entity_project_list(entity):
     """Print the name and url of all projects in entity"""
     projects = entity_projects(entity)
@@ -165,7 +165,7 @@ def print_entity_project_list(entity):
     for i, p in enumerate(projects):
         print(f" {i:2d}. {p.name:30s} (url: {p.url})")
 
-# %% ../nbs-dev/01_wandb.ipynb 53
+# %% ../nbs-dev/01_wandb.ipynb 52
 def project_artifacts(
     entity: str,                     # name of the entity from which to retrieve the artifacts 
     project_name: str,               # name of the project from which to retrieve the artifacts 
@@ -209,7 +209,7 @@ def project_artifacts(
     latest = artifacts_df.loc[row_filter, cols2show].sort_values(by='created').reset_index(drop=True)
     return latest, [t.name for t in atx_types]
 
-# %% ../nbs-dev/01_wandb.ipynb 59
+# %% ../nbs-dev/01_wandb.ipynb 58
 def run_name_exists(
     run_name: str,      # name of the run to check 
     entity: str,        # name of the entity from which to retrieve the artifacts 
@@ -221,7 +221,7 @@ def run_name_exists(
     run_matches = [run_name == r.name for r in runs]
     return any(run_matches)
 
-# %% ../nbs-dev/01_wandb.ipynb 62
+# %% ../nbs-dev/01_wandb.ipynb 61
 def unique_run_name(
     name_seed:str     # Run name to which a timestamp will be added
     ):
