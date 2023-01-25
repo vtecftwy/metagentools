@@ -151,8 +151,6 @@ checklink/cookies.txt
 .quarto
 
 # folders to exclude from version management
-# ART package for nextgen read simulations
-art/
 
 # general resources
 resources/
@@ -170,6 +168,7 @@ tests/
 #  n sub-directories of data/
 # all files in the top level of data/ will be tracked
 data/*/
+
 # output files of Art-Illumina in data_dev
 nbs-dev/data_dev/*.fq
 nbs-dev/data_dev/*.aln
