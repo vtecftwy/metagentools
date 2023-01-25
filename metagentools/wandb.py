@@ -20,11 +20,11 @@ from typing import Callable, Tuple
 def login_nb(
     nb_file: str|Path=None   # name of the notebook (str) or path to the notebook (Path)
     ):
-    """Logs in to WandB from the current notebook. Registers current notebooks as the source of code"""
+    """First step to setup WandB from notebook. Logs in and logs passed notebook as source of code"""
 
     # Validate nb_file
     if nb_file is None:
-        raise TypeError('login requires the file name of the current nb to allow code tracking')   
+        raise TypeError('the file name of the current nb is required to allow code tracking')
     if isinstance(nb_file, str):
         if nb_file[-6:] != '.ipynb': nb_file = f"{nb_file}.ipynb"
         nb_file = Path.cwd()/nb_file
@@ -40,9 +40,9 @@ def login_nb(
 
     wandb.login(relogin=False)    
 
-# %% ../nbs-dev/01_wandb.ipynb 20
+# %% ../nbs-dev/01_wandb.ipynb 19
 class WandbRun():
-    """Manages a run with WandB and all registered actions performed while the run is active. Close run with .finish()"""
+    """Manages WandB run and all logged actions performed while the run is active. Close run with .finish()"""
     
     def __init__(
         self,
@@ -103,22 +103,34 @@ class WandbRun():
         
     def upload_dataset(
         self, 
-        ds_fname: str,                # path to the file to load as dataset artifact 
+        ds_path: str,                 # path to the file or directory to load as dataset artifact 
         ds_name: str,                 # name for the dataset
         ds_type: str,                 # type of dataset: e.g. raw_data, processed_data, ...
         ds_descr: str,                # short description of the dataset
         ds_metadata: dict,            # keys/values for metadata on the dataset, eg. nb_samples, ...
+        load_type:str = 'file',       # `file` to load a single file, `dir` to load all files in a directory
         wait_completion: bool = False # when True, wait completion of the logging before returning artifact
         ):
         """Load a dataset from a file as WandB artifact, with associated information and metadata"""
         
+        # validate ds_path
+        if load_type not in ['file', 'dir']:
+            raise ValueError(f"load_type must be 'file' or 'dir'")
+        if load_type == 'file' and not Path(ds_path).is_file():
+            raise ValueError(f"No file found as {ds_path}. Please check path or load type")
+        if load_type == 'dir' and not Path(ds_path).is_dir():
+            raise ValueError(f"No directory found as {ds_path}. Please check path or load type")
+
         artifact = wandb.Artifact(name=ds_name, type=ds_type, description=ds_descr, metadata=ds_metadata)
-        artifact.add_file(ds_fname, ds_name)
+
+        if load_type == 'file':
+            artifact.add_file(ds_path, ds_name)
+        if load_type == 'dir':
+            artifact.add_dir(ds_path, ds_name)
         
         self.run.log_artifact(artifact)
         
         print(f"Dataset {ds_name} is being logged as artifact ...")
-        print(f"Artifact state: {artifact.state}")
         
         if wait_completion:
             artifact.wait()
@@ -127,7 +139,7 @@ class WandbRun():
         
         return artifact
 
-# %% ../nbs-dev/01_wandb.ipynb 39
+# %% ../nbs-dev/01_wandb.ipynb 46
 def entity_projects(
     entity: str # name of the entity from which the projects will be retrieved
     ) -> wandb.apis.public.Projects : # Projects iterator
@@ -136,7 +148,7 @@ def entity_projects(
     projects = api.projects(entity=entity)
     return projects
 
-# %% ../nbs-dev/01_wandb.ipynb 43
+# %% ../nbs-dev/01_wandb.ipynb 49
 def get_project(
     entity: str,        # name of the entity from which the project will be retrieved 
     project_name:str,   # name of the project to retrieve
@@ -145,7 +157,7 @@ def get_project(
     api = wandb.Api()
     return api.from_path(f"{entity}/{project_name}")
 
-# %% ../nbs-dev/01_wandb.ipynb 46
+# %% ../nbs-dev/01_wandb.ipynb 51
 def print_entity_project_list(entity):
     """Print the name and url of all projects in entity"""
     projects = entity_projects(entity)
@@ -153,7 +165,7 @@ def print_entity_project_list(entity):
     for i, p in enumerate(projects):
         print(f" {i:2d}. {p.name:30s} (url: {p.url})")
 
-# %% ../nbs-dev/01_wandb.ipynb 48
+# %% ../nbs-dev/01_wandb.ipynb 53
 def project_artifacts(
     entity: str,                     # name of the entity from which to retrieve the artifacts 
     project_name: str,               # name of the project from which to retrieve the artifacts 
@@ -164,41 +176,40 @@ def project_artifacts(
     """Returns all artifacts in project, w/ key info, filtered by alias, types and version + list of artifact types"""
     api = wandb.Api()
     project = api.from_path(f"{entity}/{project_name}")
-    at_types = project.artifacts_types()
+    atx_types = project.artifacts_types()
     runs = api.runs(path=f"{entity}/{project_name}")
 
     # validate by_type parameter
-    if by_type is not None and by_type not in [t.name for t in at_types]:
+    if by_type is not None and by_type not in [t.name for t in atx_types]:
         raise ValueError(f"{by_type} is not an artifact type in {entity}/{project_name}")
 
     # create a df where each row corresponds to one artifact logged during one run in this project
     # some artifact may be duplicated when linked to more than one run. Those duplicate need to be filtered out
-    cols = 'at_name at_type at_id at_state at_version at_aliases file_count created updated'.split(' ')
+    cols = 'atx_name atx_type atx_id atx_state atx_version atx_aliases file_count created updated'.split(' ')
     artifacts_df = pd.DataFrame(columns=cols)
     
     for r in runs:
-        for at in r.logged_artifacts():
-            metadata = [at.name, at.type, at.id, at.state, at.version, at.aliases, at.file_count, at.created_at, at.updated_at]
+        for atx in r.logged_artifacts():
+            metadata = [atx.name, atx.type, atx.id, atx.state, atx.version, atx.aliases, atx.file_count, atx.created_at, atx.updated_at]
             row = pd.DataFrame({k:v for k, v in zip(cols, metadata)})
-            # artifacts_df = artifacts_df.append(row)
             artifacts_df = pd.concat((artifacts_df, row), axis=0, ignore_index=True)
-    artifacts_df = artifacts_df.loc[~artifacts_df.duplicated(subset=['at_id'], keep='first'), :]
+    artifacts_df = artifacts_df.loc[~artifacts_df.duplicated(subset=['atx_id'], keep='first'), :]
 
-    cols2show = 'at_name at_version at_type at_aliases file_count created updated at_id'.split(' ')
+    cols2show = 'atx_name atx_version atx_type atx_aliases file_count created updated atx_id'.split(' ')
     # filtering by passed alias and type:
     #   if by_xxx is not None:    filter is a boolean vector
     #   if by_xxx is None:        filter is an array of 'True'
     nbr_rows = artifacts_df.shape[0]
-    alias_filter = artifacts_df.at_aliases==by_alias if by_alias is not None else np.ones(shape=(nbr_rows,), dtype=bool)
-    type_filter = artifacts_df.at_type==by_type if by_type is not None else np.ones(shape=(nbr_rows,), dtype=bool)
-    version_filter = artifacts_df.at_version==by_version if by_version is not None else np.ones(shape=(nbr_rows,), dtype=bool)
+    alias_filter = artifacts_df.atx_aliases==by_alias if by_alias is not None else np.ones(shape=(nbr_rows,), dtype=bool)
+    type_filter = artifacts_df.atx_type==by_type if by_type is not None else np.ones(shape=(nbr_rows,), dtype=bool)
+    version_filter = artifacts_df.atx_version==by_version if by_version is not None else np.ones(shape=(nbr_rows,), dtype=bool)
 
     row_filter = alias_filter * type_filter * version_filter
 
     latest = artifacts_df.loc[row_filter, cols2show].sort_values(by='created').reset_index(drop=True)
-    return latest, [t.name for t in at_types]
+    return latest, [t.name for t in atx_types]
 
-# %% ../nbs-dev/01_wandb.ipynb 54
+# %% ../nbs-dev/01_wandb.ipynb 59
 def run_name_exists(
     run_name: str,      # name of the run to check 
     entity: str,        # name of the entity from which to retrieve the artifacts 
@@ -210,7 +221,7 @@ def run_name_exists(
     run_matches = [run_name == r.name for r in runs]
     return any(run_matches)
 
-# %% ../nbs-dev/01_wandb.ipynb 57
+# %% ../nbs-dev/01_wandb.ipynb 62
 def unique_run_name(
     name_seed:str     # Run name to which a timestamp will be added
     ):
