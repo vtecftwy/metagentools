@@ -20,3 +20,8 @@ This is work in progress and aspects are probably broken. We cannot
 provide support. Use at your own risk
 
 Requirements: - python 3.10 is required for this package
+
+Installation: - `pip install metagentools` for the stable version
+
+- `pip install git+https://github.com/vtecftwy/metagentools.git@main`
+  for the latest committed version
