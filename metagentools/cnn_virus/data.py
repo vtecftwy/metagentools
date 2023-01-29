@@ -3,11 +3,11 @@
 # %% auto 0
 __all__ = ['strings_to_tensors']
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 2
-# Imports all dependencies
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 3
+from pathlib import Path
 import tensorflow as tf
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 5
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 29
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):

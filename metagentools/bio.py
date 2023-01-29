@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['p_error_from_q_score_char', 'parse_metadata_from_definition_line', 'parse_metadata_from_fasta']
 
-# %% ../nbs-dev/03_bio.ipynb 23
+# %% ../nbs-dev/03_bio.ipynb 22
 def p_error_from_q_score_char(
     char:str,             # ASCII character retrieved from Q Score or Phred value in FASTQ
     ASCII_base:int=33     # ASCII base. Mostly 33, can be 64 in old FASTQ files
@@ -14,7 +14,7 @@ def p_error_from_q_score_char(
     p_error = 10**(-Q/10)
     return p_error
 
-# %% ../nbs-dev/03_bio.ipynb 36
+# %% ../nbs-dev/03_bio.ipynb 35
 def parse_metadata_from_definition_line(
     line:str,                   # Definition line in covid sequence fasta file
     pattern:str|None = None,    # Optional regex pattern for definition lines when format is not our standard
@@ -32,7 +32,7 @@ def parse_metadata_from_definition_line(
     else:
         raise ValueError(f"No match on this line")
 
-# %% ../nbs-dev/03_bio.ipynb 38
+# %% ../nbs-dev/03_bio.ipynb 37
 def parse_metadata_from_fasta(
     path: str|Path,                 # path to the fasta sequence file
     return_metadata: bool = False   # return the metadata dictionary if True
