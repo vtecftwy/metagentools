@@ -139,7 +139,7 @@ class FastqFileIterator(TextFileBaseIterator):
 #             print(f"{seq_dict['sequence'][:80]} ...")
 #             if i >= nchunks: break
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 68
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 61
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):
