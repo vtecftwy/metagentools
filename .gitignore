@@ -163,6 +163,7 @@ tests/
 
 # wandb local directories
 */wandb/*
+**/artifacts/*
 
 # Data
 #  n sub-directories of data/
