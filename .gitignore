@@ -170,6 +170,8 @@ tests/
 # all files in the top level of data/ will be tracked
 data/*/
 
+nbs/cnn_virus/02_inference_original_model/*seq_*bp_ds
+
 # output files of Art-Illumina in data_dev
 nbs-dev/data_dev/*.fq
 nbs-dev/data_dev/*.aln
