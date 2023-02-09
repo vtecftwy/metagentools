@@ -3,7 +3,8 @@
 # %% auto 0
 __all__ = ['FastaFileIterator', 'base_metadata_parser', 'parse_metadata_fasta_cov', 'FastaMetadataIterator', 'FastaFileReader',
            'FastqFileIterator', 'parse_metadata_art_reads', 'FastqFileReader', 'AlnFileIterator',
-           'parse_metadata_art_read_aln', 'parse_art_read_aln_refseqs', 'AlnFileReader', 'strings_to_tensors']
+           'parse_metadata_art_read_aln', 'parse_art_read_aln_refseqs', 'AlnFileReader', 'create_infer_ds_from_fastq',
+           'strings_to_tensors']
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 3
 from ecutilities.core import validate_path
@@ -18,7 +19,7 @@ import numpy as np
 import re
 import tensorflow as tf
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 25
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 26
 class FastaFileIterator(TextFileBaseIterator):
     """Iterator going through a fasta file sequence by sequence and returning definition line and sequence as a dict"""
     def __init__(
@@ -57,14 +58,14 @@ def base_metadata_parser(
     matches = re.match(pattern, txt)
     metadata = {}
     if matches is not None:
-        for g in keys:
+        for g in sorted(keys):
             m = matches.group(g)
             metadata[g] = m.replace('\t', ' ').strip() if m is not None else None
         return metadata
     else:
         raise ValueError(f"No match on this line")
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 40
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 41
 def parse_metadata_fasta_cov(
     txt:str,                       # definition line in covid sequence fasta file
     pattern:Optional[str]=None,    # regex pattern to apply to parse the definition line
@@ -75,11 +76,11 @@ def parse_metadata_fasta_cov(
     By default, `pattern` and `keys` are set to match the format of the project cov sequences
     """
     if pattern is None:
-        pattern = r"^>(?P<seqid>\d+):(?P<source>ncbi):(?P<seq_nbr>\d*)(\s*|\t*)\[(?P<accession>\w*\d*)\](\s*\n|((\s*|\t)(?P=seqid))(\s*|\t)(?P=source)(\s*|\t)\d*(\s*|\t)\[(?P=accession)\](\s*|\t)(?P=seqid)(\s*|\t)(?P<species>.*)(\s*|\t)scientific name\s*\n)"
-    if keys is None: keys = 'seqid accession seq_nbr species'.split(' ')
+        pattern = r"^>(?P<seqid>(?P<taxonomyid>\d+):(?P<source>ncbi):(?P<seqnb>\d*))[\s\t]*\[(?P<accession>[\w\d]*)\]([\s\t]*(?P=taxonomyid)[\s\t]*(?P=source)[\s\t]*(?P=seqnb)[\s\t]*\[(?P=accession)\][\s\t]*(?P=taxonomyid)[\s\t]*(?P<species>[\w\s\-\_\/]*))?"
+    if keys is None: keys = 'seqid taxonomyid source accession seqnb species'.split(' ')
     return base_metadata_parser(txt, pattern, keys)
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 44
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 45
 class FastaMetadataIterator(FastaFileIterator):
     """Parse all definition lines in a FASTA file for metadata"""
     def get_metadata(
@@ -105,7 +106,7 @@ class FastaMetadataIterator(FastaFileIterator):
             
         return fasta_metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 49
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 50
 class FastaFileReader:
     """Wrap a FASTA file and retrieve its contend in raw format and parsed format"""
     def __init__(
@@ -155,10 +156,10 @@ class FastqFileIterator(TextFileBaseIterator):
         output = {
             'definition line':lines[0], 
             'sequence':f"{lines[1]}", 
-            'q scores': f"{lines[3]}",
+            'read_qscores': f"{lines[3]}",
         }
         
-        output['prob error'] = np.array([q_score2prob_error(q) for q in output['q scores']])
+        output['probs error'] = np.array([q_score2prob_error(q) for q in output['read_qscores']])
         
         return output
     
@@ -183,8 +184,8 @@ def parse_metadata_art_reads(
 
     By default, pattern and keys are set to match the output format of ART Illumina simulated reads"""
     if pattern is None:
-        pattern = r"^@(?P<readid>(?P<seqid>\d*):(?P<source>\w*):(?P<seq_nbr>\d*)-(?P<read_nbr>\d*))$"
-    if keys is None: keys = 'readid seqid source seq_nbr read_nbr'.split(' ')
+        pattern = r"^@(?P<readid>(?P<reftaxonomyid>\d*):(?P<refsource>\w*):(?P<refseqnb>\d*)-(?P<readnb>\d*))$"
+    if keys is None: keys = 'readid reftaxonomyid refsource refseqnb readnb'.split(' ')
     return base_metadata_parser(txt, pattern, keys)
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 75
@@ -205,9 +206,9 @@ class FastqFileReader:
         
     def parse_fastq(
         self, 
-        add_seq:bool=False,        # Add the read sequence to the parsed dictionary when True
-        add_q_scores:bool=False,    # Add the read ASCII Q Scores to the parsed dictionary when True
-        add_prob_error:bool=False  # Add the read probability of error to the parsed dictionary when True
+        add_readseq:bool=False,        # Add the read sequence to the parsed dictionary when True
+        add_qscores:bool=False,    # Add the read ASCII Q Scores to the parsed dictionary when True
+        add_probs_error:bool=False  # Add the read probability of error to the parsed dictionary when True
     )-> dict[str]: # Key/Values. Keys: `seqid`,`seq_nbr`,`accession`,`species`; optionaly 'sequence','q scores','prob error'
         """Read fasta file and return a dictionary with definition line metadata and optionally sequences, Q scores and prop error"""
         self.reset_iterator()
@@ -215,11 +216,11 @@ class FastqFileReader:
         for d in self.it:
             dfn_line = d['definition line']
 #             print(dfn_line)
-            seq, q_scores, prob_e = d['sequence'], d['q scores'], d['prob error']
+            seq, q_scores, prob_e = d['sequence'], d['read_qscores'], d['probs error']
             metadata = parse_metadata_art_reads(dfn_line)
-            if add_seq: metadata['sequence'] = seq         
-            if add_q_scores: metadata['q scores'] = q_scores
-            if add_prob_error: metadata['prob error'] = prob_e
+            if add_readseq: metadata['readseq'] = seq         
+            if add_qscores: metadata['read_qscores'] = q_scores
+            if add_probs_error: metadata['probs error'] = prob_e
             parsed[metadata['readid']] = metadata 
         return parsed
 
@@ -293,8 +294,8 @@ def parse_metadata_art_read_aln(
 
     By default, pattern and keys are set to match the output format of ART Illumina simulated reads"""
     if pattern is None:
-        pattern = r"^>(?P<refseqid>\d*):(?P<source>\w*):(?P<refseq_nbr>\d*)(\s|\t)(?P<readid>(?P=refseqid):(?P=source):(?P=refseq_nbr)-(?P<read_nbr>\d*))(\s|\t)(?P<aln_start_pos>\d*)(\s|\t)(?P<ref_seq_strand>(-|\+))$"
-    if keys is None: keys = 'readid refseqid source refseq_nbr read_nbr aln_start_pos ref_seq_strand'.split(' ')
+        pattern = r"^>(?P<refseqid>(?P<reftaxonomyid>\d*):(?P<refsource>\w*):(?P<refseqnb>\d*))(\s|\t)*(?P<readid>(?P=reftaxonomyid):(?P=refsource):(?P=refseqnb)-(?P<readnb>\d*(\/\d(-\d)?)?))(\s|\t)(?P<aln_start_pos>\d*)(\s|\t)(?P<refseq_strand>(-|\+))$"
+    if keys is None: keys = 'refseqid reftaxonomyid refsource refseqnb readid readnb aln_start_pos refseq_strand'.split(' ')
     return base_metadata_parser(txt, pattern, keys)
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 92
@@ -307,8 +308,8 @@ def parse_art_read_aln_refseqs(
 
     By default, pattern and keys are set to match the output format of ART Illumina simulated reads"""
     if pattern is None:
-        pattern = r"^@SQ[\t\s]*(?P<refseqid>\d*):(?P<source>\w*):(?P<refseq_nbr>\d*)[\t\s]*\[(?P<refseq_accession>[\d\w]*)\][\t\s]*(?P=refseqid)[\s\t]*(?P=source)[\s\t]*(?P=refseq_nbr)[\s\t]*\[(?P=refseq_accession)\][\s\t]*(?P=refseqid)[\s\t]*(?P<species>[\w\d\s\-\/]*)[\s\t](?P<refseq_length>\d*)$"
-    if keys is None: keys = 'refseqid source refseq_nbr refseq_accession species refseq_length'.split(' ')
+        pattern = r"^@SQ[\t\s]*(?P<refseqid>(?P<reftaxonomyid>\d*):(?P<refsource>\w*):(?P<refseqnb>\d*))[\t\s]*\[(?P<refseq_accession>[\d\w]*)\][\t\s]*(?P=reftaxonomyid)[\s\t]*(?P=refsource)[\s\t]*(?P=refseqnb)[\s\t]*\[(?P=refseq_accession)\][\s\t]*(?P=reftaxonomyid)[\s\t]*(?P<species>\w[\w\d\/\s-]*\s)[\s\t]*(?P<refseq_length>\d*)$"
+    if keys is None: keys = 'refseqid reftaxonomyid refsource refseqnb refseq_accession species refseq_length'.split(' ')
         
     return base_metadata_parser(txt, pattern, keys)
 
@@ -359,6 +360,56 @@ class AlnFileReader:
         return refseq_metadata
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 106
+def create_infer_ds_from_fastq(
+    p2fastq: str|Path,       # Path to the fastq file (aln file path is inferred)
+    overwrite_ds:bool=False, # When True, existing ds file is overwritten, When False, an error is raised if ds exists
+    nsamples:int|None=None   # Used to limit the number of reads to use for inference, use all if None
+)-> (Path, np.ndarray):      # Path to the dataset file, Array with additional read information
+    """Build a dataset file for inference only, from simreads fastq to text format ready for the CNN Virus model
+    
+    > Note: currently also return additional read information as an array. 
+    >
+    > TODO: consider to save as a file
+    """
+    fastq = FastqFileReader(p2fastq)
+    aln = AlnFileReader(p2fastq.parent / f"{p2fastq.stem}.aln")
+    
+    p2dataset = Path(f"{p2fastq.stem}_ds")
+    if p2dataset.is_file():
+        if overwrite_ds: 
+            p2dataset.unlink()
+        else:
+            raise ValueError(f"{p2dataset.name} already exists in {p2dataset.absolute()}")
+    p2dataset.touch()
+    
+    read_ids = []
+    read_refseqs = []
+    read_start_pos = []
+    read_strand = []
+    
+    with open(p2dataset, 'a') as fp:
+        i = 1
+        for fastq_chunck, aln_chunck in zip(fastq.it, aln.it):
+            seq = fastq_chunck['sequence']
+            
+            aln_meta = parse_metadata_art_read_aln(aln_chunck['definition line'])
+#             print(aln_meta.keys())
+            read_ids.append(aln_meta['readid'])
+            read_refseqs.append(aln_meta['refseqid'])
+            read_start_pos.append(aln_meta['aln_start_pos'])
+            read_strand.append(aln_meta['refseq_strand'])
+
+            fp.write(f"{seq}\t{0}\t{0}\n")
+#             print(f"{seq}\t{0}\t{0}\n")
+
+            i += 1
+            if nsamples:
+                if i > nsamples: break
+                    
+    print(f"Dataset with {i-1:,d} reads")    
+    return p2dataset, np.array(list(zip(read_ids, read_refseqs, read_start_pos, read_strand)))
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 109
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):

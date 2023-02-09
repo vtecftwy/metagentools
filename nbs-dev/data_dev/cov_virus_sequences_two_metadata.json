@@ -1,14 +1,18 @@
 {
-    "2591237": {
-        "seqid": "2591237",
+    "2591237:ncbi:1": {
         "accession": "MK211378",
-        "seq_nbr": "1",
-        "species": "Coronavirus BtRs-BetaCoV/YN2018D"
+        "seqid": "2591237:ncbi:1",
+        "seqnb": "1",
+        "source": "ncbi",
+        "species": "Coronavirus BtRs-BetaCoV/YN2018D  scientific name",
+        "taxonomyid": "2591237"
     },
-    "11128": {
-        "seqid": "11128",
+    "11128:ncbi:2": {
         "accession": "LC494191",
-        "seq_nbr": "2",
-        "species": null
+        "seqid": "11128:ncbi:2",
+        "seqnb": "2",
+        "source": "ncbi",
+        "species": null,
+        "taxonomyid": "11128"
     }
 }
