@@ -41,14 +41,14 @@ class FastaFileIterator(TextFileBaseIterator):
         self, 
         nchunks:int=3,  # number of chunks to print out
     ):
-        """Print the first `nchunks` chuncks of text from the file"""
+        """Print definition line and sequence for first `nchunks` sequences in fasta file. Sequence strings limited to 80 bps"""
         for i, seq_dict in enumerate(self.__iter__()):
             print(f"\nSequence {i+1}:")
             print(seq_dict['definition line'])
             print(f"{seq_dict['sequence'][:80]} ...")
             if i >= nchunks: break
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 33
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 34
 def base_metadata_parser(
     txt:str,         # string to parse
     pattern:str,     # regex pattern to apply to parse the string
