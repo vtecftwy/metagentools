@@ -17,11 +17,12 @@ from typing import Tuple, List, Optional
 # %% ../nbs-dev/02_art.ipynb 6
 # Private Utility functions to export ==============================================
 
-def _run(args: List[str], shell: bool=False):
+def _run(args:List[str], shell:bool=False, print_output=True):
     """Wrapper subprocess.run and prints the output"""
     p = subprocess.run(args=args, stdout=subprocess.PIPE, shell=shell)
-    print('return code: ',p.returncode, '\n')
-    print(str(p.stdout, 'utf-8'))
+    if print_output:
+        print('return code: ',p.returncode, '\n')
+        print(str(p.stdout, 'utf-8'))
 
 def _validate_path(p:str|Path) -> Path:
     """checks that path is a string or a Path, and returns a Path"""
@@ -45,16 +46,19 @@ class ArtIllumina:
 
     def __init__(
         self, 
-        path2app: str|Path,           # path to the art_illumina application on the system
-        input_dir: str|Path,          # path to dir where input files are
-        output_dir: str|Path=None     # path to dir where to save output files, if different from input_dir
+        path2app: str|Path,            # full path to art_illumina application on the system
+        input_dir: str|Path,           # full path to dir where input files are
+        output_dir: str|Path=None,     # full path to dir where to save output files, if different from input_dir
+        app_in_system_path:bool=False, # whether `art_illumina` is in the system path or not
         ):
         """Initialize the art_illumina instance"""
 
         # Validate and save paths
-        path2app = _validate_path(path2app)        
-        if path2app.is_file():
-            self.app = path2app
+        path2app = _validate_path(path2app)
+        if app_in_system_path:
+            self.app_cmd = 'art_illumina'
+        elif path2app.is_file():
+            self.app_cmd = str(path2app.absolute())
         else:
             raise ValueError(f"{path2app.name} is not a file, please check the path to the application")
 
@@ -73,7 +77,7 @@ class ArtIllumina:
             else:
                 raise ValueError(f"{input_dir.name} is not a directory, please check the path")
 
-        print(f"Ready to operate with art: {self.app.absolute()}")
+        print(f"Ready to operate with art: {self.app_cmd}")
         print(f"Input files from : {self.input_dir.absolute()}")
         print(f"Output files to :  {self.output_dir.absolute()}")
 
@@ -87,7 +91,8 @@ class ArtIllumina:
         mean_read: int=None,      # mean length of the read for paired reads
         std_read: int=None,       # std of the read length, for paired reads
         ss: str='HS25',           # quality profile to use for simulation,
-        overwrite: bool=False     # overwrite existing output files if true, raise error if false 
+        overwrite: bool=False,    # overwrite existing output files if true, raise error if false 
+        print_output:bool=True    # if True, prints art ilumina's CLI output
         ):
         """Simulates reads with art_illumina. Output files saved in a separate directory"""
 
@@ -98,6 +103,7 @@ class ArtIllumina:
         else:
             raise ValueError(f"{input_file} is not a file in {self.input_dir}")
 
+        
         # validate output seed and save in instance
         if not overwrite and len(list(self.output_dir.glob(f"{output_seed}*"))) > 0: 
             raise ValueError(f"Existing output directory starting with {output_seed}")
@@ -124,9 +130,8 @@ class ArtIllumina:
         p2in = self.last_input_file.absolute()
         p2out = (self.output_dir / self.last_output_seed / self.last_output_seed).absolute()
 
-        cmd = f"{self.app.absolute()} -i {p2in} {params} -o {p2out}"
-
-        _run(args=shlex.split(cmd))
+        cmd = f"{self.app_cmd} -i {p2in} {params} -o {p2out}"
+        _run(args=shlex.split(cmd), print_output=print_output)
 
     def get_last_output_files(self):
         """Returns the path to all output files from last simulation"""

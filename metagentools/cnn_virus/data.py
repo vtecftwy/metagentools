@@ -308,7 +308,8 @@ def parse_art_read_aln_refseqs(
 
     By default, pattern and keys are set to match the output format of ART Illumina simulated reads"""
     if pattern is None:
-        pattern = r"^@SQ[\t\s]*(?P<refseqid>(?P<reftaxonomyid>\d*):(?P<refsource>\w*):(?P<refseqnb>\d*))[\t\s]*\[(?P<refseq_accession>[\d\w]*)\][\t\s]*(?P=reftaxonomyid)[\s\t]*(?P=refsource)[\s\t]*(?P=refseqnb)[\s\t]*\[(?P=refseq_accession)\][\s\t]*(?P=reftaxonomyid)[\s\t]*(?P<species>\w[\w\d\/\s-]*\s)[\s\t]*(?P<refseq_length>\d*)$"
+#         pattern = r"^@SQ[\t\s]*(?P<refseqid>(?P<reftaxonomyid>\d*):(?P<refsource>\w*):(?P<refseqnb>\d*))[\t\s]*\[(?P<refseq_accession>[\d\w]*)\][\t\s]*(?P=reftaxonomyid)[\s\t]*(?P=refsource)[\s\t]*(?P=refseqnb)[\s\t]*\[(?P=refseq_accession)\][\s\t]*(?P=reftaxonomyid)[\s\t]*(?P<species>\w[\w\d\/\s-]*\s)[\s\t]*(?P<refseq_length>\d*)$"
+        pattern = r"^@SQ[\t\s]*(?P<refseqid>(?P<reftaxonomyid>\d*):(?P<refsource>\w*):(?P<refseqnb>\d*))[\t\s]*\[(?P<refseq_accession>[\d\w]*)\][\t\s]*(?P=reftaxonomyid)[\s\t]*(?P=refsource)[\s\t]*(?P=refseqnb)[\s\t]*\[(?P=refseq_accession)\][\s\t]*(?P=reftaxonomyid)[\s\t]*(?P<species>\w[\w\d\/\s\-\.]*)[\s\t](?P<refseq_length>\d*)$"
     if keys is None: keys = 'refseqid reftaxonomyid refsource refseqnb refseq_accession species refseq_length'.split(' ')
         
     return base_metadata_parser(txt, pattern, keys)
@@ -361,9 +362,10 @@ class AlnFileReader:
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 106
 def create_infer_ds_from_fastq(
-    p2fastq: str|Path,       # Path to the fastq file (aln file path is inferred)
-    overwrite_ds:bool=False, # When True, existing ds file is overwritten, When False, an error is raised if ds exists
-    nsamples:int|None=None   # Used to limit the number of reads to use for inference, use all if None
+    p2fastq: str|Path,             # Path to the fastq file (aln file path is inferred)
+    output_dir:str|Path|None=None, # Path to directory where ds file will be saved
+    overwrite_ds:bool=False,       # If True, overwrite existing ds file. If False, error is raised if ds file exists
+    nsamples:int|None=None         # Used to limit the number of reads to use for inference, use all if None
 )-> (Path, np.ndarray):      # Path to the dataset file, Array with additional read information
     """Build a dataset file for inference only, from simreads fastq to text format ready for the CNN Virus model
     
@@ -374,7 +376,13 @@ def create_infer_ds_from_fastq(
     fastq = FastqFileReader(p2fastq)
     aln = AlnFileReader(p2fastq.parent / f"{p2fastq.stem}.aln")
     
-    p2dataset = Path(f"{p2fastq.stem}_ds")
+    if output_dir is None:
+        p2dir = Path()
+    else:
+        validate_path(output_dir, path_type='dir', raise_error=True)
+        p2outdir = output_dir if isinstance(output_dir, Path) else Path(output_dir)
+    
+    p2dataset = p2outdir / f"{p2fastq.stem}_ds"
     if p2dataset.is_file():
         if overwrite_ds: 
             p2dataset.unlink()
@@ -408,6 +416,7 @@ def create_infer_ds_from_fastq(
                     
     print(f"Dataset with {i-1:,d} reads")    
     return p2dataset, np.array(list(zip(read_ids, read_refseqs, read_start_pos, read_strand)))
+
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 109
 def strings_to_tensors(
