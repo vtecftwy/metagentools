@@ -170,7 +170,11 @@ tests/
 # all files in the top level of data/ will be tracked
 data/*/
 
+# Specific types of files in the nbs directory
 nbs/cnn_virus/02_inference_original_model/*seq_*bp_ds
+nbs/cnn_virus/*.pdf
+nbs/cnn_virus/*/*.pdf
+nbs/cnn_virus/*/*/*.pdf
 
 # output files of Art-Illumina in data_dev
 nbs-dev/data_dev/*.fq
