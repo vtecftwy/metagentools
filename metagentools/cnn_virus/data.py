@@ -25,6 +25,7 @@ class FastaFileReader(TextFileBaseReader):
         path: str|Path,  # path to the Fasta file
     ):
         super().__init__(path, nlines=1)
+        # self.parsing_rules_json = Path('../default_parsing_rules.json').resolve()
         self.text_to_parse_key = 'definition line'
         self.set_parsing_rules(verbose=False)
         
@@ -256,7 +257,7 @@ class AlnFileReader(TextFileBaseReader):
         TODO: refactor this and the method in Core: to use a single function for the common part and a parameter for               the text_to_parse 
         """
         
-        P2JSON = Path('../parsing_rules.json')
+        P2JSON = Path('../default_parsing_rules.json')
         
         self.re_header_rule_name = None
         self.re_header_pattern = None
