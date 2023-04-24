@@ -23,7 +23,6 @@ except: pass
 from . import __file__
 CODE_ROOT = Path(__file__).parents[0]
 PACKAGE_ROOT = Path(__file__).parents[1]
-# os.environ['METAGENTOOLS_ROOT'] = PACKAGE_ROOT
 
 # %% ../nbs-dev/00_core.ipynb 7
 class TextFileBaseReader:
@@ -321,7 +320,7 @@ class ProjectFileSystem:
     @property
     def project_root(self):
         if self.is_local:
-            return Path('..').resolve()
+            return PACKAGE_ROOT
         elif self.is_colab:
             return self.gdrive / self._shared_project_dir
         elif self.is_kaggle:
