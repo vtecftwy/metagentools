@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['create_model_original']
 
-# %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 2
+# %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 3
 # Imports all dependencies
 import tensorflow as tf
 import tensorflow.keras
@@ -15,32 +15,32 @@ from tensorflow.keras.layers import Convolution1D, Dense, Flatten, Dropout, Acti
 from tensorflow.keras.layers import MaxPooling1D, Concatenate
 from tensorflow.keras.models import Sequential, Model, load_model
 
-# %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 6
+# %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 8
 def create_model_original() -> tf.keras.Model: # new instance of an original paper architecture
     """Build a CNN model as per CNN Virus paper"""
 
     print("Creating CNN Model (Original)")
 
     #build cnn model
-    input_seq=Input(shape=(50,5))
-    layer1=Convolution1D(512, 5, padding="same",activation="relu",kernel_initializer="he_uniform")(input_seq)
-    layer2=BatchNormalization(momentum=0.6)(layer1)
-    layer3=MaxPooling1D(pool_size=2,padding='same')(layer2)
-    layer4=Convolution1D(512, 5, padding="same",activation="relu",kernel_initializer="he_uniform")(layer3)
-    layer5=BatchNormalization(momentum=0.6)(layer4)
-    layer6=MaxPooling1D(pool_size=2,padding='same')(layer5)
-    layer7=Convolution1D(1024, 7, padding="same",activation="relu",kernel_initializer="he_uniform")(layer6)
-    layer8=Convolution1D(1024, 7, padding="same",activation="relu",kernel_initializer="he_uniform")(layer7)
-    layer9=BatchNormalization(momentum=0.6)(layer8)
-    layer10=MaxPooling1D(pool_size=2,padding='same')(layer9)
-    layer11=Flatten()(layer10)
-    layer12=Dense(1024,kernel_initializer="he_uniform")(layer11)
-    layer13=BatchNormalization(momentum=0.6)(layer12)
-    layer14=Dropout(0.2)(layer13)
-    output1=Dense(187, activation='softmax',kernel_initializer="he_uniform",name="output1")(layer14)
-    output_con=Concatenate()([layer14,output1])
-    layer15=Dense(1024, kernel_initializer="he_uniform")(output_con)
-    layer16=BatchNormalization(momentum=0.6)(layer15)
-    output2=Dense(10, activation='softmax',kernel_initializer="he_uniform",name="output2")(layer16)
-    model = Model(inputs=input_seq, outputs=[output1,output2])
+    input_seq=Input(shape=(50,5), name='input-seq')
+    layer1=Convolution1D(512, 5, padding="same",activation="relu",kernel_initializer="he_uniform", name="conv-1")(input_seq)
+    layer2=BatchNormalization(momentum=0.6, name='bn-1')(layer1)
+    layer3=MaxPooling1D(pool_size=2,padding='same', name='maxpool-1')(layer2)
+    layer4=Convolution1D(512, 5, padding="same",activation="relu",kernel_initializer="he_uniform", name="conv-2")(layer3)
+    layer5=BatchNormalization(momentum=0.6, name='bn-2')(layer4)
+    layer6=MaxPooling1D(pool_size=2,padding='same',name='maxpool-2')(layer5)
+    layer7=Convolution1D(1024, 7, padding="same", activation="relu",kernel_initializer="he_uniform", name="conv-3")(layer6)
+    layer8=Convolution1D(1024, 7, padding="same", activation="relu",kernel_initializer="he_uniform", name="conv-4")(layer7)
+    layer9=BatchNormalization(momentum=0.6, name='bn-3')(layer8)
+    layer10=MaxPooling1D(pool_size=2,padding='same', name='maxpool-3')(layer9)
+    layer11=Flatten(name='flatten')(layer10)
+    layer12=Dense(1024,kernel_initializer="he_uniform", name='dense-1')(layer11)
+    layer13=BatchNormalization(momentum=0.6, name='bn-4')(layer12)
+    layer14=Dropout(0.2, name='do-1')(layer13)
+    labels=Dense(187, activation='softmax',kernel_initializer="he_uniform",name="labels")(layer14)
+    output_con=Concatenate(name='concat')([layer14,labels])
+    layer15=Dense(1024, kernel_initializer="he_uniform", name='dense-2')(output_con)
+    layer16=BatchNormalization(momentum=0.6, name='bn-5')(layer15)
+    pos=Dense(10, activation='softmax',kernel_initializer="he_uniform",name="pos")(layer16)
+    model = Model(inputs=input_seq, outputs=[labels,pos])
     return model    

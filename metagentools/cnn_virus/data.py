@@ -2,22 +2,26 @@
 
 # %% auto 0
 __all__ = ['CODE_ROOT', 'PACKAGE_ROOT', 'FastaFileReader', 'FastqFileReader', 'AlnFileReader', 'create_infer_ds_from_fastq',
-           'strings_to_tensors']
+           'strings_to_tensors', 'DataGenerator_from_50mer', 'get_learning_weights', 'get_params_50mer',
+           'get_params_150mer', 'get_kmer_from_50mer', 'get_kmer_from_150mer']
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 3
-from ecutilities.core import validate_path
-from functools import partial, partialmethod
-from ..bio import q_score2prob_error
-from ..core import TextFileBaseReader, JsonFileReader
-from pathlib import Path
-from typing import Any, Optional
-
 import json
 import numpy as np
 import os
 import re
 import tensorflow as tf
 import warnings
+
+from ecutilities.core import validate_path
+from functools import partial, partialmethod
+from ..bio import q_score2prob_error
+from ..core import TextFileBaseReader, ProjectFileSystem
+from pathlib import Path
+from typing import Any, Optional
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # or any {'0', '1', '2'}
+from tensorflow.keras.utils import Sequence, to_categorical
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 4
 # Retrieve the package root
@@ -400,7 +404,7 @@ def create_infer_ds_from_fastq(
     return p2dataset, np.array(list(zip(read_ids, read_refseqs, read_start_pos, read_strand)))
 
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 121
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 122
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):
@@ -457,3 +461,120 @@ def strings_to_tensors(
     y_pos= tf.gather(tf.eye(n_pos), y_pos)
 
     return (x_seqs, (y_labels, y_pos))
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 125
+class DataGenerator_from_50mer(Sequence):
+    """data generator for generating batches of data from 50-mers"""
+
+    d_nucl = {"A": 0,"C": 1,"G": 2,"T": 3,"N":4}
+
+    def __init__(self, f_matrix, f_labels, f_pos, batch_size=1024,n_classes=187, shuffle=True):
+        self.batch_size = batch_size
+        self.labels = f_labels
+        self.matrix = f_matrix
+        self.pos = f_pos
+        self.n_classes = n_classes
+        self.shuffle = shuffle
+        self.on_epoch_end()
+    def __len__(self):
+        return int(np.ceil(len(self.labels) / self.batch_size))
+    def __getitem__(self, index):
+        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        X, y= self.__data_generation(indexes)
+        return X,y
+    def on_epoch_end(self):
+        self.indexes = np.arange(len(self.labels))
+        if self.shuffle == True:
+            np.random.shuffle(self.indexes)
+    def __data_generation(self, index):
+        x_train=[]
+        for i in index:
+            seq=self.matrix[i]
+            seq_list=[j for j in seq]
+            x_train.append(seq_list)
+        x_train=np.array(x_train)
+        x_tensor=np.zeros(list(x_train.shape)+[5])
+        for row in range(len(x_train)):
+            for col in range(50):
+                x_tensor[row,col,self.d_nucl[x_train[row,col]]]=1
+        y_pos=[]
+        y_label=[self.labels[i] for i in index]
+        y_label=np.array(y_label)
+        y_label=to_categorical(y_label, num_classes=self.n_classes)
+        y_pos=[self.pos[i] for i in index]
+        y_pos=np.array(y_pos)
+        y_pos=to_categorical(y_pos, num_classes=10)
+        return x_tensor,{'labels': y_label, 'pos': y_pos}
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 127
+def get_learning_weights(filepath):
+    """get different learning weights for different classes, from file"""
+    f = open(filepath,"r").readlines()
+    d_weights = {}
+    for i in f:
+        i = i.strip().split("\t")
+        d_weights[float(i[0])]=float(i[1])
+    return d_weights
+
+def get_params_50mer():
+    """set default params for generating batches of 50-mer"""
+    params = {'batch_size': 1024,
+    'n_classes': 187,
+    'shuffle': True}
+    return params
+
+def get_params_150mer():
+    """ set default params for generating batches of 150-mer"""
+    params = {'batch_size': 101,
+    'n_classes': 187,
+    'shuffle': False}
+    return params
+
+def get_kmer_from_50mer(filepath, max_seqs=None):
+    """Load data from sequence file and returns three tensors, with max nbr sequences"""
+    f_matrix=[]
+    f_labels=[]
+    f_pos=[]
+    with open(filepath, 'r') as fp:
+        i = 0
+        while True:
+            line = fp.readline()
+            i += 1
+            # EOF
+            if line == '':
+                break
+            # Reached max number of k-mers to load from file
+            elif max_seqs is not None and i > max_seqs:
+                break
+            else:
+                seq, label, pos = line.strip().split('\t')
+                f_matrix.append(seq)
+                f_labels.append(label)
+                f_pos.append(pos)
+    return f_matrix,f_labels,f_pos
+
+def get_kmer_from_150mer(filepath, max_seqs=None):
+    """Load data from sequence file and returns three tensors, with max nbr sequences"""
+    f_matrix=[]
+    f_labels=[]
+    f_pos=[]
+    with open(filepath,"r") as fp:
+        i = 0
+        while True:
+            line = fp.readline()
+            i += 1
+            # EOF
+            if line == '':
+                break
+            # Reached max number of k-mers to load from file
+            elif max_seqs is not None and i > max_seqs:
+                break
+            else:
+                seq, label, pos = line.strip().split('\t')
+                # Split 150-mer into 101 50-mers, shifted by one nucleotide
+                for i in range(len(seq)-49):
+                    kmer=seq[i:i+50]
+                    f_matrix.append(kmer)
+                    f_labels.append(label)
+                    f_pos.append(pos)
+    return f_matrix,f_labels,f_pos
