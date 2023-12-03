@@ -252,8 +252,7 @@ class AlnFileReader(TextFileBaseReader):
             metadata = self.parse_text(seq_dfn_line, pattern, keys)
             parsed[metadata['refseqid']] = metadata
             
-        return parsed
-            
+        return parsed       
         
     def set_header_parsing_rules(
         self,
@@ -265,7 +264,7 @@ class AlnFileReader(TextFileBaseReader):
                
         Updates 3 class attributes: `re_header_rule_name`, `re_header_pattern`, `re_header_keys`
         
-        TODO: refactor this and the method in Core: to use a single function for the common part and a parameter for               the text_to_parse 
+        TODO: refactor this and the method in Core: to use a single function for the common part and a parameter for the text_to_parse 
         """
         
         P2JSON = Path(f"{PACKAGE_ROOT}/default_parsing_rules.json")
@@ -338,13 +337,8 @@ class AlnFileReader(TextFileBaseReader):
     
     @property
     def ref_sequences(self):
-        refseq_metadata = {}
-        for refseq in self.header['reference sequences']:
-            
-            meta = parse_art_read_aln_refseqs(refseq)
-            refseq_metadata[meta['refseqid']] = meta
-        
-        return refseq_metadata
+        """Return a dict with metadata for each reference sequence in the header"""        
+        return self.parse_header_reference_sequences()
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 118
 def create_infer_ds_from_fastq(
@@ -363,7 +357,7 @@ def create_infer_ds_from_fastq(
     aln = AlnFileReader(p2fastq.parent / f"{p2fastq.stem}.aln")
     
     if output_dir is None:
-        p2dir = Path()
+        p2outdir = Path()
     else:
         validate_path(output_dir, path_type='dir', raise_error=True)
         p2outdir = output_dir if isinstance(output_dir, Path) else Path(output_dir)
@@ -383,10 +377,10 @@ def create_infer_ds_from_fastq(
     
     with open(p2dataset, 'a') as fp:
         i = 1
-        for fastq_chunk, aln_chunk in zip(fastq.it, aln.it):
+        for fastq_chunk, aln_chunk in zip(fastq, aln):
             seq = fastq_chunk['sequence']
             
-            aln_meta = parse_metadata_art_read_aln(aln_chunk['definition line'])
+            aln_meta = aln.parse_text(aln_chunk['definition line'])
 #             print(aln_meta.keys())
             read_ids.append(aln_meta['readid'])
             read_refseqs.append(aln_meta['refseqid'])
