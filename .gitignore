@@ -150,15 +150,17 @@ checklink/cookies.txt
 # Quarto
 .quarto
 
-# folders to exclude from version management
+# ===========================================================================
+# Project files and folders to exclude from tracking and GitHub
 
-# general resources
+# Secrets, keys, ...
+secrets/
+
+# General resources
 resources/
 
-# Legacy python code: to delete later
+# Legacy python code from CNN Virus article authors. To delete later
 legacy/
-
-# testing scripts, from legacy code: to delete later
 tests/
 
 # wandb local directories
@@ -166,40 +168,27 @@ tests/
 **/artifacts/*
 
 # Data
-#  n sub-directories of data/
-# all files in the top level of data/ will be tracked
+# Track all files in the top level directory data/ 
+# Ignore all files in the subdirectories data/xxx
 data/*/
 
-# Specific types of files in the nbs directory
-nbs/cnn_virus/02_inference_original_model/*seq_*bp_ds
-nbs/cnn_virus/*.pdf
-nbs/cnn_virus/*/*.pdf
-nbs/cnn_virus/*/*/*.pdf
-
-# output files of Art-Illumina in data_dev
+# Package Development Files
+# Output files of Art-Illumina in data_dev
 nbs-dev/data_dev/*.fq
 nbs-dev/data_dev/*.aln
 nbs-dev/data_dev/*.sam
 nbs-dev/data_dev/paired*
+
+
+# Work notebooks (nbs) excluded from tracking, i.e. all files in work-nbs subdirectory
+nbs/*/work-nbs
 
 # dataset files created by nbs
 nbs/*_ds 
 nbs/*/*_ds 
 nbs/*/*/*_ds 
 
-# nbs not to track
-nbs/cnn_virus/0*/*
-nbs/cnn_virus/1*/*
-nbs/cnn_virus/3*/*
-nbs/cnn_virus/4*/*
-nbs/cnn_virus/5*/*
-nbs/cnn_virus/6*/*
-nbs/cnn_virus/7*/*
-nbs/cnn_virus/8*/*
-nbs/cnn_virus/9*/*
-
-# WIP
+# Any file marked as WIP
 wip.*.ipynb
-
-# Confidential informations
-secrets/
+nbs/wip.*.ipynb
+nbs/*/wip.*.ipynb
