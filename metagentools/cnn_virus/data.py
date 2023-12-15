@@ -8,6 +8,7 @@ __all__ = ['CODE_ROOT', 'PACKAGE_ROOT', 'FastaFileReader', 'FastqFileReader', 'A
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 3
 import json
 import numpy as np
+import pandas as pd
 import os
 import re
 import tensorflow as tf
@@ -18,6 +19,7 @@ from functools import partial, partialmethod
 from ..bio import q_score2prob_error
 from ..core import TextFileBaseReader, ProjectFileSystem
 from pathlib import Path
+from tqdm.notebook import tqdm, trange
 from typing import Any, Optional
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # or any {'0', '1', '2'}
@@ -346,12 +348,10 @@ def create_infer_ds_from_fastq(
     output_dir:str|Path|None=None, # Path to directory where ds file will be saved
     overwrite_ds:bool=False,       # If True, overwrite existing ds file. If False, error is raised if ds file exists
     nsamples:int|None=None         # Used to limit the number of reads to use for inference, use all if None
-)-> (Path, np.ndarray):      # Path to the dataset file, Array with additional read information
-    """Build a dataset file for inference only, from simreads fastq to text format ready for the CNN Virus model
+)-> (Path, Path, pd.DataFrame):    # Paths to dataset file, path to metadata file, dataframe with metadata
+    """Build an inference dataset file as required by the CNN Virus model from a simreads fastq (ART format).
     
-    > Note: currently also return additional read information as an array. 
-    >
-    > TODO: consider to save as a file
+    Also extract the fastq read sequence metadata, saves it in a metadata file and returns them as a DataFrame
     """
     fastq = FastqFileReader(p2fastq)
     aln = AlnFileReader(p2fastq.parent / f"{p2fastq.stem}.aln")
@@ -363,12 +363,16 @@ def create_infer_ds_from_fastq(
         p2outdir = output_dir if isinstance(output_dir, Path) else Path(output_dir)
     
     p2dataset = p2outdir / f"{p2fastq.stem}_ds"
+    p2metadata = p2outdir / f"{p2fastq.stem}_metadata.csv"
+    
     if p2dataset.is_file():
         if overwrite_ds: 
             p2dataset.unlink()
+            if p2metadata.is_file(): p2metadata.unlink()
         else:
             raise ValueError(f"{p2dataset.name} already exists in {p2dataset.absolute()}")
     p2dataset.touch()
+    p2metadata.touch()
     
     read_ids = []
     read_refseqs = []
@@ -377,28 +381,34 @@ def create_infer_ds_from_fastq(
     
     with open(p2dataset, 'a') as fp:
         i = 1
-        for fastq_chunk, aln_chunk in zip(fastq, aln):
+        for fastq_chunk, aln_chunk in tqdm(zip(fastq, aln)):
             seq = fastq_chunk['sequence']
             
             aln_meta = aln.parse_text(aln_chunk['definition line'])
-#             print(aln_meta.keys())
             read_ids.append(aln_meta['readid'])
             read_refseqs.append(aln_meta['refseqid'])
             read_start_pos.append(aln_meta['aln_start_pos'])
             read_strand.append(aln_meta['refseq_strand'])
 
             fp.write(f"{seq}\t{0}\t{0}\n")
-#             print(f"{seq}\t{0}\t{0}\n")
 
             i += 1
             if nsamples:
                 if i > nsamples: break
                     
-    print(f"Dataset with {i-1:,d} reads")    
-    return p2dataset, np.array(list(zip(read_ids, read_refseqs, read_start_pos, read_strand)))
+    print(f"Dataset with {i-1:,d} reads")
 
+    metadata = np.array(list(zip(read_ids, read_refseqs, read_start_pos, read_strand)))
+    metadata = pd.DataFrame(data={
+                'read_ids': read_ids,
+                'read_refseqs': read_refseqs,
+                'read_start_pos': read_start_pos,
+                'read_strand': read_strand})
+    metadata.to_csv(p2metadata, index=True)
+    
+    return p2dataset, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 122
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 126
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):
@@ -456,7 +466,7 @@ def strings_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 125
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 129
 class DataGenerator_from_50mer(Sequence):
     """data generator for generating batches of data from 50-mers"""
 
@@ -500,7 +510,7 @@ class DataGenerator_from_50mer(Sequence):
         y_pos=to_categorical(y_pos, num_classes=10)
         return x_tensor,{'labels': y_label, 'pos': y_pos}
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 127
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 131
 def get_learning_weights(filepath):
     """get different learning weights for different classes, from file"""
     f = open(filepath,"r").readlines()

@@ -295,6 +295,13 @@ class ProjectFileSystem:
                 warnings.warn(msg, UserWarning)
 
     def __call__(self): return self.is_local
+
+    def info(self):
+        print(f"Running {self.os} on {self.running_on}")
+        print(f"Device's home directory: {self.home}")
+        print(f"Project file structure:")
+        print(f" - Root ........ {self.project_root} \n - Data Dir .... {self.data} \n - Notebooks ... {self.nbs}")
+
     
     def read_config(self):
         """Read config from the configuration file if it exists and return an empty config if does not"""
@@ -343,6 +350,15 @@ class ProjectFileSystem:
         """Return `True` if the current machine was registered as a local machine"""
         cfg = self.read_config()
         return cfg['Infra'].getboolean('registered_as_local', False)
+
+    @property
+    def running_on(self):
+        """Return the device on which this is run: local, colab, kaggle, ..."""
+        if self.is_local: device = 'local computer'
+        elif self.is_colab: device = 'colab'
+        elif self.is_kaggle: device = 'kaggle'
+        else: device = 'unknown cloud server'
+        return device
     
 
 # %% ../nbs-dev/00_core.ipynb 49
