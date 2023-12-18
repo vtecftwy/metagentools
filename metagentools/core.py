@@ -106,10 +106,10 @@ class TextFileBaseReader:
         else: 
             # TODO: review hack below, to avoid error when missing metadata such as 'species name'.
             # Current code tries to recover by saving the entire line in the fist key, expected to be the seqid or refseid
-            if txt:
-                metadata[keys[0]] = txt.replace('\t', ' ').strip() if txt is not None else None
-            else:
-                raise ValueError(f"No match on this line")
+            # if txt:
+            #     metadata[keys[0]] = txt.replace('\t', ' ').strip() if txt is not None else None
+            # else:
+            raise ValueError(f"No match on this line")
         return metadata
 
     def parse_text(
