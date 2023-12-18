@@ -47,8 +47,8 @@ class FastaFileReader(TextFileBaseReader):
         lines = []
         for i in range(2):
             lines.append(self._safe_readline())
-        dfn_line = lines[0]
-        sequence = lines[1].replace('\n', '')
+        dfn_line = lines[0].replace('\n', '')   #remove the next line symbol at the end of the line
+        sequence = lines[1].replace('\n', '')   #remove the next line symbol at the end of the line
         return {'definition line':dfn_line, 'sequence':f"{sequence}"}
     
     def print_first_chunks(
@@ -61,7 +61,7 @@ class FastaFileReader(TextFileBaseReader):
             print(f"\nSequence {i+1}:")
             print(seq_dict['definition line'])
             print(f"{seq_dict['sequence'][:80]} ...")
-            if i >= nchunks: break
+            if i >= nchunks-1: break
         self.reset_iterator()
             
     def parse_file(

@@ -10,7 +10,8 @@ import os
 import re
 import sys
 import warnings
-from ecutilities.core import is_type, safe_path
+from ecutilities.core import is_type, validate_path, safe_path
+from IPython.display import display, Markdown, HTML
 from pathlib import Path
 from pprint import pprint
 from typing import Any, Optional
@@ -101,16 +102,22 @@ class TextFileBaseReader:
             for g in sorted(keys):
                 m = matches.group(g)
                 metadata[g] = m.replace('\t', ' ').strip() if m is not None else None
-            return metadata
-        else:
-            raise ValueError(f"No match on this line")
+        
+        else: 
+            # TODO: review hack below, to avoid error when missing metadata such as 'species name'.
+            # Current code tries to recover by saving the entire line in the fist key, expected to be the seqid or refseid
+            if txt:
+                metadata[keys[0]] = txt.replace('\t', ' ').strip() if txt is not None else None
+            else:
+                raise ValueError(f"No match on this line")
+        return metadata
 
     def parse_text(
         self,
-        txt:str,              # text to parse
-        pattern:str=None,     # If None, uses standard regex pattern to extract metadata, otherwise, uses passed regex
-        keys:list[str]=None,  # If None, uses standard regex list of keys, otherwise, uses passed list of keys (str)
-    )-> dict:                 # parsed metadata in key/value format
+        txt:str,                    # text to parse
+        pattern:str=None,           # If None, uses standard regex pattern to extract metadata, otherwise, uses passed regex
+        keys:list[str]=None,        # If None, uses standard regex list of keys, otherwise, uses passed list of keys (str)
+    )-> dict:                       # parsed metadata in key/value format
         """Parse text using regex pattern and key. Return a metadata dictionary
         
         The passed text is parsed using the regex pattern. The method return a dictionary in the format:
@@ -257,7 +264,7 @@ class JsonFileReader:
 
 # %% ../nbs-dev/00_core.ipynb 34
 class ProjectFileSystem:
-    """Class to set paths to key directories, according to whether the code is running locally or in the cloud."""
+    """Simpleton Class to set paths to key directories, according to whether the code is running locally or in the cloud."""
 
     _instance = None
     _config_dir = '.metagentools'
@@ -297,11 +304,11 @@ class ProjectFileSystem:
     def __call__(self): return self.is_local
 
     def info(self):
+        """Print basic info on the file system and the device"""
         print(f"Running {self.os} on {self.running_on}")
         print(f"Device's home directory: {self.home}")
         print(f"Project file structure:")
         print(f" - Root ........ {self.project_root} \n - Data Dir .... {self.data} \n - Notebooks ... {self.nbs}")
-
     
     def read_config(self):
         """Read config from the configuration file if it exists and return an empty config if does not"""
@@ -335,7 +342,6 @@ class ProjectFileSystem:
         else:
             raise ValueError('Not running locally, on Colab or on Kaggle')
 
-
     @property
     def data(self): return self.project_root / 'data'
 
@@ -360,8 +366,27 @@ class ProjectFileSystem:
         else: device = 'unknown cloud server'
         return device
     
+    def readme(self, dir_path=None):
+        """Display `readme.md` file or any other `.md` file in `dir_path`, to get information on the directory content"""
+        if dir_path is None: 
+            path = self.data
+        elif validate_path(dir_path, path_type='dir'):
+            path = dir_path
+        else:
+            raise ValueError(f"'dir_path' is not a directory: {dir_path.absolute()}")
 
-# %% ../nbs-dev/00_core.ipynb 49
+        display(Markdown(f"*{path.absolute()}*"))
+        mdfiles = {p.stem: p for p in path.glob('*.md')}
+        if mdfiles:
+            mdfile = mdfiles.get('readme', None)
+            if mdfile is None:
+                mdfile = mdfiles.get(list(mdfiles.keys())[0])
+            display(Markdown(filename=mdfile))
+        else:
+            print('No markdown file in this folder')
+        
+
+# %% ../nbs-dev/00_core.ipynb 50
 class TextFileBaseIterator:
     """`TextFileBaseIterator` is a deprecated class, to be replaced by `TextFileBaseReader`"""
     def __init__(self, *args, **kwargs):
