@@ -31,7 +31,7 @@ from .. import __file__
 CODE_ROOT = Path(__file__).parents[0]
 PACKAGE_ROOT = Path(__file__).parents[1]
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 27
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 23
 class FastaFileReader(TextFileBaseReader):
     """Wrap a FASTA file and retrieve its content in raw format and parsed format"""
     def __init__(
@@ -88,7 +88,7 @@ class FastaFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 71
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 67
 class FastqFileReader(TextFileBaseReader):
     """Iterator going through a fastq file's sequences and return each section + prob error as a dict"""
     def __init__(
@@ -154,7 +154,7 @@ class FastqFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 86
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 82
 class AlnFileReader(TextFileBaseReader):
     """Iterator going through an ALN file"""
     def __init__(
@@ -342,7 +342,7 @@ class AlnFileReader(TextFileBaseReader):
         """Return a dict with metadata for each reference sequence in the header"""        
         return self.parse_header_reference_sequences()
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 118
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 114
 def create_infer_ds_from_fastq(
     p2fastq: str|Path,             # Path to the fastq file (aln file path is inferred)
     output_dir:str|Path|None=None, # Path to directory where ds file will be saved
@@ -408,7 +408,7 @@ def create_infer_ds_from_fastq(
     
     return p2dataset, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 126
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 122
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):
@@ -466,7 +466,7 @@ def strings_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 129
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 125
 class DataGenerator_from_50mer(Sequence):
     """data generator for generating batches of data from 50-mers"""
 
@@ -510,7 +510,7 @@ class DataGenerator_from_50mer(Sequence):
         y_pos=to_categorical(y_pos, num_classes=10)
         return x_tensor,{'labels': y_label, 'pos': y_pos}
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 131
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 127
 def get_learning_weights(filepath):
     """get different learning weights for different classes, from file"""
     f = open(filepath,"r").readlines()

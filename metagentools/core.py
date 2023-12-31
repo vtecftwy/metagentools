@@ -375,7 +375,7 @@ class ProjectFileSystem:
         else:
             raise ValueError(f"'dir_path' is not a directory: {dir_path.absolute()}")
 
-        display(Markdown(f"*{path.absolute()}*"))
+        display(Markdown(f"ReadMe file for directory: `{path.relative_to(self.project_root)}`:"))
         mdfiles = {p.stem: p for p in path.glob('*.md')}
         if mdfiles:
             mdfile = mdfiles.get('readme', None)
