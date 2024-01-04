@@ -2,8 +2,9 @@
 
 # %% auto 0
 __all__ = ['CODE_ROOT', 'PACKAGE_ROOT', 'FastaFileReader', 'FastqFileReader', 'AlnFileReader', 'create_infer_ds_from_fastq',
-           'strings_to_tensors', 'DataGenerator_from_50mer', 'get_learning_weights', 'get_params_50mer',
-           'get_params_150mer', 'get_kmer_from_50mer', 'get_kmer_from_150mer']
+           'strings_to_tensors', 'tfrecord_from_fastq', 'tfrecord_from_text', 'get_dataset_from_tfr',
+           'DataGenerator_from_50mer', 'get_learning_weights', 'get_params_50mer', 'get_params_150mer',
+           'get_kmer_from_50mer', 'get_kmer_from_150mer']
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 3
 import json
@@ -23,7 +24,10 @@ from tqdm.notebook import tqdm, trange
 from typing import Any, Optional
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # or any {'0', '1', '2'}
+import tensorflow as tf
+from tensorflow.io import serialize_tensor, FixedLenFeature
 from tensorflow.keras.utils import Sequence, to_categorical
+from tensorflow.data import TextLineDataset, TFRecordDataset
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 4
 # Retrieve the package root
@@ -31,7 +35,7 @@ from .. import __file__
 CODE_ROOT = Path(__file__).parents[0]
 PACKAGE_ROOT = Path(__file__).parents[1]
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 23
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 26
 class FastaFileReader(TextFileBaseReader):
     """Wrap a FASTA file and retrieve its content in raw format and parsed format"""
     def __init__(
@@ -88,7 +92,7 @@ class FastaFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 67
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 72
 class FastqFileReader(TextFileBaseReader):
     """Iterator going through a fastq file's sequences and return each section + prob error as a dict"""
     def __init__(
@@ -154,13 +158,14 @@ class FastqFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 82
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 87
 class AlnFileReader(TextFileBaseReader):
     """Iterator going through an ALN file"""
     def __init__(
         self,
         path:str|Path,   # path to the aln file
     )-> dict:            # key/value with keys: 
+        """Set TextFileBaseReader attributes and specific class attributes"""
         self.nlines = 1
         super().__init__(path, nlines=self.nlines)
         self.header = self.read_header()
@@ -168,6 +173,7 @@ class AlnFileReader(TextFileBaseReader):
         self.text_to_parse_key = 'definition line'
         self.set_parsing_rules(verbose=False)
         self.set_header_parsing_rules(verbose=False)
+        self.ref_sequences = self.parse_header_reference_sequences()
 
     def __next__(self):
         """Return definition line, sequence and quality scores"""
@@ -220,6 +226,18 @@ class AlnFileReader(TextFileBaseReader):
         while True:
             line = self._safe_readline().replace('\n', '')
             if line.startswith('##Header End'): break
+
+    def parse_definition_line_with_position(
+        self, 
+        dfn_line:str    # fefinition line string to be parsed
+        )-> dict:       # parsed metadata in key/value format + relative position of the read
+        """Parse definition line and adds relative position"""
+        read_meta = self.parse_text(dfn_line)
+        read_refseqid = read_meta['refseqid']
+        read_start_pos = int(read_meta['aln_start_pos'])
+        read_refseq_lentgh = int(self.ref_sequences[read_refseqid]['refseq_length'])
+        read_meta['read_pos'] = (read_start_pos *10)// read_refseq_lentgh + 1
+        return read_meta
     
     def parse_file(
         self, 
@@ -336,13 +354,8 @@ class AlnFileReader(TextFileBaseReader):
 
             # We used the iterator, now we need to reset it to make all lines available
             self.reset_iterator()
-    
-    @property
-    def ref_sequences(self):
-        """Return a dict with metadata for each reference sequence in the header"""        
-        return self.parse_header_reference_sequences()
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 114
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 123
 def create_infer_ds_from_fastq(
     p2fastq: str|Path,             # Path to the fastq file (aln file path is inferred)
     output_dir:str|Path|None=None, # Path to directory where ds file will be saved
@@ -408,7 +421,7 @@ def create_infer_ds_from_fastq(
     
     return p2dataset, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 122
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 129
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):
@@ -466,7 +479,206 @@ def strings_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 125
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 132
+def _bytes_feature(value):
+    """Returns a bytes_list from a string / byte."""
+    if isinstance(value, type(tf.constant(0))): # if value ist tensor
+        value = value.numpy() # get value of tensor
+    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+def _float_feature(value):
+  """Returns a floast_list from a float / double."""
+  return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
+
+def _int64_feature(value):
+  """Returns an int64_list from a bool / enum / int / uint."""
+  return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+
+def _serialize_array(array):
+  array = serialize_tensor(array)
+  return array
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 133
+def _base_hot_encode(
+    line: str        # one string (one line in text dataset)
+    ):
+    """Convert a line from text dataset into three tensors: read sequence (BHE), virus label and position"""
+    
+    # Split the line (string) in three : read, label, position
+    t = tf.strings.split(line.replace('\n', ''), '\t')
+
+    # Split the sequence string into a list of single base strings:
+    # 'TCAAAATAATCA' -> ['T','C','A','A','A','A','T','A','A','T','C','A']
+    read = tf.strings.bytes_split(t[0])
+
+    # Base Hot Encode sequences (BHE)
+    # Each base letter (A, C, G, T, N) is replaced by a OHE vector
+    #     "A" converted into [1,0,0,0,0]
+    #     "C" converted into [0,1,0,0,0]
+    #     "G" converted into [0,0,1,0,0]
+    #     "T" converted into [0,0,0,1,0]
+    #     "N" converted into [0,0,0,0,1]
+    
+    # Decode the base letters A, C, ... into their ASCII code for easy conversion into BHE
+    # ASCII code for A, C, G, T and N:
+    A, C, G, T, N = 65, 67, 71, 84, 78
+    read_uint8 = tf.io.decode_raw(read, out_type=tf.uint8)
+
+    # Technical Notes: 
+    #   tf.io.decode_raw adds one dimension at the end in the process
+    #   [b'C', b'A', b'T'] will return [[67], [65], [84]] and not [67, 65, 84]
+    #   this is actually what we want to contatenate the values for each base letter
+    read_A = tf.cast(read_uint8 == A, tf.float32)
+    read_C = tf.cast(read_uint8 == C, tf.float32)
+    read_G = tf.cast(read_uint8 == G, tf.float32)
+    read_T = tf.cast(read_uint8 == T, tf.float32)
+    read_N = tf.cast(read_uint8 == N , tf.float32)
+    x_reads = tf.concat([read_A, read_C, read_G, read_T, read_N], axis=1)
+
+    # OHE labels
+    n_labels = 187
+    y_labels = tf.strings.to_number(t[1], out_type=tf.int32) # int32 so it can be used an index in gather
+    y_labels = tf.gather(tf.eye(n_labels, dtype=tf.float32), y_labels)
+
+    # OHE positions
+    n_pos = 10
+    y_pos = tf.strings.to_number(t[2], out_type=tf.int32) # int32 so it can be used an index in gather
+    y_pos= tf.gather(tf.eye(n_pos, dtype=tf.float32), y_pos)
+
+    return x_reads, y_labels, y_pos
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 134
+def tfrecord_from_fastq(
+    p2fastq:Path,              # Path to the fastaq file (should be associated with a aln file)
+    p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
+    overwrite:bool=False       # When True, overides any existing file, When False, raises an error
+    ) -> (Path, Path):         # Paths to the saved TFRecord file and the metadata csv file
+    """Creates a TFRecord dataset for inference from fastq and aln files, as well as a csv metadata file
+
+    The TFRecord dataset can be used for training or prediction, using the original CNN Virus model.
+    The metadata file is a Pandas DataFrame converted into csv
+    """
+    # Setup paths
+    if p2tfrds is None:
+        p2tfrds = ProjectFileSystem().data / 'saved/cnn_virus_datasets' / f"{p2fastq.stem}.tfrecords"
+    p2metadata = p2tfrds.parent / f"{p2tfrds.stem}.metadata"
+
+    if p2tfrds.exists():
+        if overwrite:
+            p2tfrds.unlink()
+            if p2metadata.exists(): p2metadata.unlink()
+        else: 
+            raise ValueError(f"{p2tfrds.name} already exists. To overwrite, set parameter `overwrite` to True")
+
+    p2aln = p2fastq.parent / f"{p2fastq.stem}.aln"
+    assert p2aln.is_file(), f"No ALN file associated with {fastq.name}"
+    
+    fastq = FastqFileReader(p2fastq)
+    aln = AlnFileReader(p2aln)
+    read_ids, read_refseqs, read_start_pos, read_strand = [], [], [], []
+    writer = tf.io.TFRecordWriter(str(p2tfrds.absolute())) 
+
+    for i, (fastq_element, aln_element) in tqdm(enumerate(zip(fastq, aln))):
+        # Extract read text sequence from fastq and metadata from aln files
+        seq = fastq_element['sequence']           
+        aln_meta = aln.parse_text(aln_element['definition line'])
+        read_ids.append(aln_meta['readid'])
+        read_refseqs.append(aln_meta['refseqid'])
+        read_start_pos.append(aln_meta['aln_start_pos'])
+        read_strand.append(aln_meta['refseq_strand'])
+
+        # Create and write one Example, including BHE sequence, the label and the position
+        bhe_seq, label, pos = _base_hot_encode(f"{seq}\t{0}\t{0}\n")
+        data = {
+            'read' : _bytes_feature(_serialize_array(bhe_seq)),
+            'label' : _bytes_feature(_serialize_array(label)),
+            'pos' : _bytes_feature(_serialize_array(pos))
+        }
+        out = tf.train.Example(features=tf.train.Features(feature=data))
+        writer.write(out.SerializeToString())
+
+    writer.close()
+    print(f"Wrote {i+1} reads to TFRecord file {p2tfrds.name}")
+
+    metadata = np.array(list(zip(read_ids, read_refseqs, read_start_pos, read_strand)))
+    metadata = pd.DataFrame(data={
+                'read_ids': read_ids,
+                'read_refseqs': read_refseqs,
+                'read_start_pos': read_start_pos,
+                'read_strand': read_strand})
+    metadata.to_csv(p2metadata, index=True)
+    
+    return p2tfrds, p2metadata, metadata
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 135
+def tfrecord_from_text(
+    p2ds,                      # Path to the text dataset, in the format of original CNN Virus data
+    p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
+    overwrite:bool=False       # When True, overides any existing file, When False, raises an error
+    ) -> Path:                 # Path to the saved TFRecord file
+    # Setup paths
+    if p2tfrds is None:
+        p2tfrds = ProjectFileSystem().data / 'saved/cnn_virus_datasets' / f"{p2ds.stem}.tfrecords"
+    # p2metadata = p2tfrds.parent / f"{p2tfrds.stem}.metadata"
+
+    if p2tfrds.exists():
+        if overwrite:
+            p2tfrds.unlink()
+            # if p2metadata.exists(): p2metadata.unlink()
+        else: 
+            raise ValueError(f"{p2tfrds.name} already exists. To overwrite, set parameter `overwrite` to True")
+
+    reads = TextFileBaseReader(p2ds, nlines=1)
+    writer = tf.io.TFRecordWriter(str(p2tfrds.absolute())) 
+
+    for i, line in enumerate(reads):
+        # Create and write one Example, including BHE sequence, the label and the position
+        bhe_seq, label, pos = _base_hot_encode(line)
+        data = {
+            'read' : _bytes_feature(_serialize_array(bhe_seq)),
+            'label' : _bytes_feature(_serialize_array(label)),
+            'pos' : _bytes_feature(_serialize_array(pos))
+            }
+        out = tf.train.Example(features=tf.train.Features(feature=data))
+        writer.write(out.SerializeToString())
+
+    writer.close()
+    print(f"Wrote {i+1} reads to TFRecord")
+    return p2tfrds
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 136
+def _parse_tfr_element(element):
+    # Define the underlying structure of the data (mirror the dta structure above)
+    data = {    
+        'read' : FixedLenFeature([], tf.string),
+        'label' : FixedLenFeature([], tf.string),
+        'pos' : FixedLenFeature([], tf.string) 
+    }
+
+    content = tf.io.parse_single_example(element, data)
+  
+    read_bytes = content['read']
+    label_bytes = content['label']
+    pos_bytes = content['pos']
+    
+    # Parse the string tensor into a real tensors, with proper types
+    read = tf.io.parse_tensor(read_bytes, out_type=tf.float32)
+    label = tf.io.parse_tensor(label_bytes, out_type=tf.float32)
+    pos = tf.io.parse_tensor(pos_bytes, out_type=tf.float32)
+    
+    return (read, (label, pos))
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 137
+def get_dataset_from_tfr(
+    p2tfrds:Path   # Path to the TFRecord dataset
+    ) -> tf.data.Dataset: # dataset
+    # Create a dataset from the TFRecord file
+    dataset = tf.data.TFRecordDataset(p2tfrds)
+    # Convert the strings into the proper format using the parsing function
+    dataset = dataset.map(_parse_tfr_element)
+    return dataset
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 146
 class DataGenerator_from_50mer(Sequence):
     """data generator for generating batches of data from 50-mers"""
 
@@ -510,7 +722,7 @@ class DataGenerator_from_50mer(Sequence):
         y_pos=to_categorical(y_pos, num_classes=10)
         return x_tensor,{'labels': y_label, 'pos': y_pos}
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 127
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 148
 def get_learning_weights(filepath):
     """get different learning weights for different classes, from file"""
     f = open(filepath,"r").readlines()

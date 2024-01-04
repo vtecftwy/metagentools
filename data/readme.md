@@ -3,11 +3,11 @@ This directory includes all the data required for the project `metagentools`.
 
 ```text
 data
-     |--- CNN_Virus_data 
-     |--- ncbi           
-     |--- ncov_data      
-     |--- saved         
-     |--- ....           
+ |--- CNN_Virus_data 
+ |--- ncbi           
+ |--- ncov_data      
+ |--- saved         
+ |--- ....           
      
 ```
 #### Sub-directories
@@ -15,5 +15,3 @@ data
 - `ncbi`: includes data related to the use of CoV sequences from NCBI: reference sequences, simulated reads, inference datasets, inference results.
 - `ncov_data`: includes data related to the use of non Cov sequences from various sources: reference sequences, simulated reads, inference datasets, inference results.
 - `saved`: includes model saved parameters and preprocessing datasets.
-
----

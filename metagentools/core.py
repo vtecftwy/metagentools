@@ -375,13 +375,16 @@ class ProjectFileSystem:
         else:
             raise ValueError(f"'dir_path' is not a directory: {dir_path.absolute()}")
 
-        display(Markdown(f"ReadMe file for directory: `{path.relative_to(self.project_root)}`:"))
+        display(HTML('<hr>'))
+        display(Markdown(f"ReadMe file for directory `{path.relative_to(self.project_root)}`:"))
         mdfiles = {p.stem: p for p in path.glob('*.md')}
         if mdfiles:
             mdfile = mdfiles.get('readme', None)
             if mdfile is None:
                 mdfile = mdfiles.get(list(mdfiles.keys())[0])
+            display(HTML('<hr>'))
             display(Markdown(filename=mdfile))
+            display(HTML('<hr>'))
         else:
             print('No markdown file in this folder')
         
