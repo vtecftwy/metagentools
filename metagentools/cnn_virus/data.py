@@ -355,7 +355,7 @@ class AlnFileReader(TextFileBaseReader):
             # We used the iterator, now we need to reset it to make all lines available
             self.reset_iterator()
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 123
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 124
 def create_infer_ds_from_fastq(
     p2fastq: str|Path,             # Path to the fastq file (aln file path is inferred)
     output_dir:str|Path|None=None, # Path to directory where ds file will be saved
@@ -368,6 +368,7 @@ def create_infer_ds_from_fastq(
     """
     fastq = FastqFileReader(p2fastq)
     aln = AlnFileReader(p2fastq.parent / f"{p2fastq.stem}.aln")
+    read_refseqs
     
     if output_dir is None:
         p2outdir = Path()
@@ -403,7 +404,9 @@ def create_infer_ds_from_fastq(
             read_start_pos.append(aln_meta['aln_start_pos'])
             read_strand.append(aln_meta['refseq_strand'])
 
-            fp.write(f"{seq}\t{0}\t{0}\n")
+            label = 0
+            pos = 0
+            fp.write(f"{seq}\t{label}\t{pos}\n")
 
             i += 1
             if nsamples:
@@ -421,7 +424,7 @@ def create_infer_ds_from_fastq(
     
     return p2dataset, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 129
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 130
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):
@@ -479,7 +482,7 @@ def strings_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 132
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 133
 def _bytes_feature(value):
     """Returns a bytes_list from a string / byte."""
     if isinstance(value, type(tf.constant(0))): # if value ist tensor
@@ -498,7 +501,7 @@ def _serialize_array(array):
   array = serialize_tensor(array)
   return array
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 133
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 134
 def _base_hot_encode(
     line: str        # one string (one line in text dataset)
     ):
@@ -547,7 +550,7 @@ def _base_hot_encode(
 
     return x_reads, y_labels, y_pos
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 134
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 135
 def tfrecord_from_fastq(
     p2fastq:Path,              # Path to the fastaq file (should be associated with a aln file)
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
@@ -610,7 +613,7 @@ def tfrecord_from_fastq(
     
     return p2tfrds, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 135
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 136
 def tfrecord_from_text(
     p2ds,                      # Path to the text dataset, in the format of original CNN Virus data
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
@@ -646,7 +649,7 @@ def tfrecord_from_text(
     print(f"Wrote {i+1} reads to TFRecord")
     return p2tfrds
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 136
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 137
 def _parse_tfr_element(element):
     # Define the underlying structure of the data (mirror the dta structure above)
     data = {    
@@ -668,7 +671,7 @@ def _parse_tfr_element(element):
     
     return (read, (label, pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 137
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 138
 def get_dataset_from_tfr(
     p2tfrds:Path   # Path to the TFRecord dataset
     ) -> tf.data.Dataset: # dataset
@@ -678,7 +681,7 @@ def get_dataset_from_tfr(
     dataset = dataset.map(_parse_tfr_element)
     return dataset
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 146
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 147
 class DataGenerator_from_50mer(Sequence):
     """data generator for generating batches of data from 50-mers"""
 
@@ -722,7 +725,7 @@ class DataGenerator_from_50mer(Sequence):
         y_pos=to_categorical(y_pos, num_classes=10)
         return x_tensor,{'labels': y_label, 'pos': y_pos}
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 148
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 149
 def get_learning_weights(filepath):
     """get different learning weights for different classes, from file"""
     f = open(filepath,"r").readlines()

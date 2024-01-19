@@ -188,6 +188,11 @@ nbs/*_ds
 nbs/*/*_ds 
 nbs/*/*/*_ds 
 
+# art output files created with nbs
+nbs/reads
+nbs/*/reads
+nbs/*/*/reads
+
 # Any file marked as WIP
 wip.*.ipynb
 nbs/wip.*.ipynb

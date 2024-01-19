@@ -75,7 +75,7 @@ class ArtIllumina:
             if output_dir.is_dir():
                 self.output_dir = output_dir
             else:
-                raise ValueError(f"{input_dir.name} is not a directory, please check the path")
+                raise ValueError(f"{output_dir.name} is not a directory, please check the path")
 
         print(f"Ready to operate with art: {self.app_cmd}")
         print(f"Input files from : {self.input_dir.absolute()}")
@@ -144,7 +144,7 @@ class ArtIllumina:
 
     def list_all_input_files(self):
         for f in sorted(list(self.input_dir.iterdir())):
-            print(f.name)
+            if f.suffix == '.fa': print(f.name)
 
     def get_all_output_files(self):
         """Return a dictionary with k as output file subdirectory and v as list of output files"""
