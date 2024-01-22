@@ -368,7 +368,6 @@ def create_infer_ds_from_fastq(
     """
     fastq = FastqFileReader(p2fastq)
     aln = AlnFileReader(p2fastq.parent / f"{p2fastq.stem}.aln")
-    read_refseqs
     
     if output_dir is None:
         p2outdir = Path()
@@ -485,7 +484,7 @@ def strings_to_tensors(
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 133
 def _bytes_feature(value):
     """Returns a bytes_list from a string / byte."""
-    if isinstance(value, type(tf.constant(0))): # if value ist tensor
+    if isinstance(value, type(tf.constant(0))): # if value is tensor
         value = value.numpy() # get value of tensor
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
@@ -553,7 +552,7 @@ def _base_hot_encode(
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 135
 def tfrecord_from_fastq(
     p2fastq:Path,              # Path to the fastaq file (should be associated with a aln file)
-    p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
+    p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in saved directory
     overwrite:bool=False       # When True, overides any existing file, When False, raises an error
     ) -> (Path, Path):         # Paths to the saved TFRecord file and the metadata csv file
     """Creates a TFRecord dataset for inference from fastq and aln files, as well as a csv metadata file
@@ -575,12 +574,15 @@ def tfrecord_from_fastq(
 
     p2aln = p2fastq.parent / f"{p2fastq.stem}.aln"
     assert p2aln.is_file(), f"No ALN file associated with {fastq.name}"
-    
+
+    # Create file readers
     fastq = FastqFileReader(p2fastq)
     aln = AlnFileReader(p2aln)
-    read_ids, read_refseqs, read_start_pos, read_strand = [], [], [], []
-    writer = tf.io.TFRecordWriter(str(p2tfrds.absolute())) 
 
+    read_ids, read_refseqs, read_start_pos, read_strand = [], [], [], []
+
+    # Create TFRecord writer and loop through reads
+    writer = tf.io.TFRecordWriter(str(p2tfrds.absolute())) 
     for i, (fastq_element, aln_element) in tqdm(enumerate(zip(fastq, aln))):
         # Extract read text sequence from fastq and metadata from aln files
         seq = fastq_element['sequence']           
