@@ -675,13 +675,14 @@ def _parse_tfr_element(element):
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 138
 def get_dataset_from_tfr(
-    p2tfrds:Path   # Path to the TFRecord dataset
-    ) -> tf.data.Dataset: # dataset
+    p2tfrds:Path,      # Path to the TFRecord dataset
+    batch_size:int = 1 # Desired batch side for the dataset
+    ) -> tf.data.Dataset: # dataset, formated with the batch size
     # Create a dataset from the TFRecord file
     dataset = tf.data.TFRecordDataset(p2tfrds)
     # Convert the strings into the proper format using the parsing function
     dataset = dataset.map(_parse_tfr_element)
-    return dataset
+    return dataset.batch(batch_size)
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 147
 class DataGenerator_from_50mer(Sequence):
