@@ -10,18 +10,21 @@ import tensorflow.keras
 
 from pathlib import Path
 from typing import Callable, Tuple
+from ..core import ProjectFileSystem
 
 from tensorflow.keras.layers import Convolution1D, Dense, Flatten, Dropout, Activation, BatchNormalization, Input
 from tensorflow.keras.layers import MaxPooling1D, Concatenate
 from tensorflow.keras.models import Sequential, Model, load_model
 
 # %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 8
-def create_model_original() -> tf.keras.Model: # new instance of an original paper architecture
+def create_model_original(
+    load_parameters: bool = True, # Load pretrained weights when True
+    path2parameters: Path = None,  # Path to pretrained weights, defaults to project CNN Virus weights
+    ) -> tf.keras.Model:          # New instance of an original paper architecture
     """Build a CNN model as per CNN Virus paper"""
 
     print("Creating CNN Model (Original)")
-
-    #build cnn model
+    # Build cnn model
     input_seq=Input(shape=(50,5), name='input-seq')
     layer1=Convolution1D(512, 5, padding="same",activation="relu",kernel_initializer="he_uniform", name="conv-1")(input_seq)
     layer2=BatchNormalization(momentum=0.6, name='bn-1')(layer1)
@@ -42,5 +45,17 @@ def create_model_original() -> tf.keras.Model: # new instance of an original pap
     layer15=Dense(1024, kernel_initializer="he_uniform", name='dense-2')(output_con)
     layer16=BatchNormalization(momentum=0.6, name='bn-5')(layer15)
     pos=Dense(10, activation='softmax',kernel_initializer="he_uniform",name="pos")(layer16)
-    model = Model(inputs=input_seq, outputs=[labels,pos])
+    model = Model(inputs=input_seq, outputs=[labels,pos], name="CNN_Virus")
+
+    # Load pretrained weights
+    if load_parameters:
+        if path2parameters is None: 
+            path2parameters = ProjectFileSystem().data /'saved/cnn_virus_original/pretrained_model.h5'
+        if not path2parameters.is_file(): 
+            raise FileNotFoundError(f"Could not find pretrained model at {path2parameters}")
+        print(f"Loading parameters from {path2parameters.name}")
+        model.load_weights(path2parameters)
+        print("Created pretrained model")
+    else:
+        print("Created randomly initialized model")
     return model    
