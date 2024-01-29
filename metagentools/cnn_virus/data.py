@@ -2,11 +2,13 @@
 
 # %% auto 0
 __all__ = ['CODE_ROOT', 'PACKAGE_ROOT', 'OriginalLabels', 'FastaFileReader', 'FastqFileReader', 'AlnFileReader',
-           'create_infer_ds_from_fastq', 'strings_to_tensors', 'tfrecord_from_fastq', 'tfrecord_from_text',
-           'get_dataset_from_tfr', 'DataGenerator_from_50mer', 'get_learning_weights', 'get_params_50mer',
-           'get_params_150mer', 'get_kmer_from_50mer', 'get_kmer_from_150mer']
+           'create_infer_ds_from_fastq', 'strings_to_tensors', 'split_kmer_into_50mers', 'tfrecord_from_fastq',
+           'tfrecord_from_text', 'get_dataset_from_tfr', 'combine_predictions', 'DataGenerator_from_50mer',
+           'get_learning_weights', 'get_params_50mer', 'get_params_150mer', 'get_kmer_from_50mer',
+           'get_kmer_from_150mer']
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 3
+import collections
 import json
 import numpy as np
 import pandas as pd
@@ -44,7 +46,9 @@ class OriginalLabels:
         assert p2mapping.is_file()
         df = pd.read_csv(p2mapping, sep='\t', header=None, names=['species', 'label'])
         self._label2species = df['species'].to_list()
+        self._label2species.append('Unknown Virus Species')
         self._species2label = {specie:label for specie, label in zip(df['species'], df['label'])}
+        self._species2label['Unknown Virus Species'] = len(self._label2species)
 
     def label2species(self, n:int):
         return self._label2species[n]
@@ -567,6 +571,24 @@ def _base_hot_encode(
     return x_reads, y_labels, y_pos
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 139
+def split_kmer_into_50mers(
+    kmer: tf.Tensor        # tensor representing a single k-mer read, after base
+    ):
+    """Converts a k-mer read into several 50-mer reads, by shifting the k-mer one base at a time."""
+    def fn(accumulated, elem):
+        return tf.roll(accumulated, shift=-elem, axis=0)
+
+    k, n = kmer.shape[0], 50
+    nb_splits = (k-n+1)
+    # Create a tensor of integers, with a 0 as first element and 1 for all other elements, for shifts
+    shifts = np.ones(shape=nb_splits, dtype=int)
+    shifts[0] = 0 
+    shifts = tf.convert_to_tensor(shifts, dtype=tf.int64)
+    # Use tf.scan to shift the original read nb_splits times
+    shifted = tf.scan(fn, shifts, kmer, reverse=False)
+    return shifted[:, :n, :]  # return the tensor with shifted kmer, sliced to only keep 50 bases
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 140
 def tfrecord_from_fastq(
     p2fastq:Path,              # Path to the fastaq file (should be associated with a aln file)
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in saved directory
@@ -632,7 +654,7 @@ def tfrecord_from_fastq(
     
     return p2tfrds, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 140
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 141
 def tfrecord_from_text(
     p2ds,                      # Path to the text dataset, in the format of original CNN Virus data
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
@@ -668,7 +690,7 @@ def tfrecord_from_text(
     print(f"Wrote {i+1} reads to TFRecord")
     return p2tfrds
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 141
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 142
 def _parse_tfr_element(element):
     # Define the underlying structure of the data (mirror the dta structure above)
     data = {    
@@ -690,7 +712,7 @@ def _parse_tfr_element(element):
     
     return (read, (label, pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 142
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 143
 def get_dataset_from_tfr(
     p2tfrds:Path,      # Path to the TFRecord dataset
     batch_size:int = 1 # Desired batch side for the dataset
@@ -701,7 +723,31 @@ def get_dataset_from_tfr(
     dataset = dataset.map(_parse_tfr_element)
     return dataset.batch(batch_size)
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 151
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 150
+def combine_predictions(labels, label_probs, positions):
+    """Combine set of 50-mer predictions into one final prediction for label and position"""
+
+    # Filter our any prediction with low predicted probability 
+    valid_preds_mask = tf.reduce_max(label_probs, axis=1) >= 0.9
+    valid_labels = labels[valid_preds_mask].numpy()
+    valid_positions = positions[valid_preds_mask].numpy()
+
+    # Return prediction outside the label and position ranges if no valid prediction
+    if len(valid_labels) == 0:
+        return 187, 10
+
+    # Take most frequent label, and most frequent position for the selected label
+    else:
+        unique_labels, _, counts = tf.unique_with_counts(valid_labels)
+        combined_label = unique_labels[tf.argmax(counts)].numpy()
+
+        df = pd.DataFrame({'labels': valid_labels, 'positions': valid_positions})
+        gb = df.groupby('labels')
+        counter_pos = collections.Counter(df.positions.iloc[gb.groups[combined_label]].tolist())
+        combined_pos = counter_pos.most_common(1)[0][0]
+        return combined_label, combined_pos
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 154
 class DataGenerator_from_50mer(Sequence):
     """data generator for generating batches of data from 50-mers"""
 
@@ -745,7 +791,7 @@ class DataGenerator_from_50mer(Sequence):
         y_pos=to_categorical(y_pos, num_classes=10)
         return x_tensor,{'labels': y_label, 'pos': y_pos}
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 153
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 156
 def get_learning_weights(filepath):
     """get different learning weights for different classes, from file"""
     f = open(filepath,"r").readlines()
