@@ -281,7 +281,8 @@ class ProjectFileSystem:
     
     def __init__(
         self, 
-        mount_gdrive:bool=True  # True to mount Google Drive if running on Colab
+        mount_gdrive:bool=True,  # True to mount Google Drive if running on Colab
+        project_file:Path=None  # Path to the project file. If None, use the one saved in the config file
         ):
             self.is_colab = 'google.colab' in sys.modules       
             if self.is_colab and mount_gdrive:
@@ -300,6 +301,19 @@ class ProjectFileSystem:
                       before you can use the ProjectFileSystem class.
                       """
                 warnings.warn(msg, UserWarning)
+
+            self._project_root = Path()
+            if self.is_local:
+                cfg = self.read_config()
+                path_str = cfg.get('Infra', 'project_root', fallback=None)
+                if path_str is None: 
+                    msg = """
+                    Project root is not yet set in config file.
+                    To set it, use `ProjectFileSystem().set_project_root()`.
+                    """
+                    warnings.warn(msg)
+                else:
+                    self._project_root = Path(path_str)
 
     def __call__(self): return self.is_local
 
@@ -328,13 +342,33 @@ class ProjectFileSystem:
             cfg.write(fp)
         return cfg
 
+    def set_project_root(
+        self, 
+        p2project: str|Path   # string or Path to the project directory. Can be absolute or relative to home
+        ):
+        """Update the configuration file to set the project root"""
+        # Build and validate the path to the project root
+        if isinstance(p2project, str): 
+            p2project = Path(p2project)
+            if not p2project.is_absolute():
+                p2project = self.home / p2project
+        if not p2project.is_dir(): raise FileNotFoundError(f"{p2project.absolute()} does not exist")
+        
+        # Update the configuration file        
+        cfg = self.read_config()
+        os.makedirs(self.home/self._config_dir, exist_ok=True)
+        cfg['Infra']['project_root'] = str(p2project.absolute())
+        with open(self.p2config, 'w') as fp:
+            cfg.write(fp)
+        return cfg
+
     @property
     def os(self): return sys.platform
 
     @property
     def project_root(self):
         if self.is_local:
-            return PACKAGE_ROOT
+            return self._project_root
         elif self.is_colab:
             return self.gdrive / self._shared_project_dir
         elif self.is_kaggle:
