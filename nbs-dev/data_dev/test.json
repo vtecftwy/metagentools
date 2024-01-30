@@ -1,18 +1,14 @@
 {
     "item 1": {
-        "pattern": "pattern 1",
-        "keys": "key key key key"
+        "keys": "key key key key",
+        "pattern": "pattern 1"
     },
     "item 2": {
-        "pattern": "pattern 2",
-        "keys": "key key key key"
+        "keys": "key key key key",
+        "pattern": "pattern 2"
     },
     "item 3": {
-        "pattern": "pattern 3",
-        "keys": "key key key key"
-    },
-    "another item": {
         "keys": "key key key key",
-        "pattern": "another pattern"
+        "pattern": "pattern 3"
     }
 }
