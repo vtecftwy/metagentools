@@ -14,7 +14,7 @@ def q_score2prob_error(
     p_error = 10**(-Q/10)
     return p_error
 
-# %% ../nbs-dev/03_bio.ipynb 34
+# %% ../nbs-dev/03_bio.ipynb 35
 class StandardDNACodon:
     """Hold standard DNA codon reference information
     

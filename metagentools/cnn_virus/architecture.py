@@ -16,7 +16,7 @@ from tensorflow.keras.layers import Convolution1D, Dense, Flatten, Dropout, Acti
 from tensorflow.keras.layers import MaxPooling1D, Concatenate
 from tensorflow.keras.models import Sequential, Model, load_model
 
-# %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 8
+# %% ../../nbs-dev/03_cnn_virus_architecture.ipynb 9
 def create_model_original(
     load_parameters: bool = True, # Load pretrained weights when True
     path2parameters: Path = None,  # Path to pretrained weights, defaults to project CNN Virus weights

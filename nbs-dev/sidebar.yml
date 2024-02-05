@@ -2,7 +2,7 @@ website:
   sidebar:
     contents:
       - index.ipynb
-      - section: Common
+      - section: General Code
         contents: 
           - 00_core.ipynb
           - 01_wandb.ipynb
