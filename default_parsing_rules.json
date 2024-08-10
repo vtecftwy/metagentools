@@ -1,5 +1,5 @@
 {
-    "fasta_cov_ncbi": {
+    "fasta_ncbi_std": {
         "pattern": "^>(?P<seqid>(?P<taxonomyid>\\d+):(?P<source>ncbi):(?P<seqnb>\\d*))[\\s\\t]*\\[(?P<accession>[\\w\\d]*)\\]([\\s\\t]*(?P=taxonomyid)[\\s\\t]*(?P=source)[\\s\\t]*(?P=seqnb)[\\s\\t]*\\[(?P=accession)\\][\\s\\t]*(?P=taxonomyid)[\\s\\t]*(?P<species>[\\w\\s\\-\\_\\/]*))?",
         "keys": "seqid taxonomyid source accession seqnb species"
     },
@@ -7,16 +7,16 @@
         "pattern": "^>\\d[\\s\\t](?P<seq_type>dna_rm):(?P<id_type>[\\w\\_]*)[\\s\\w](?P=id_type):(?P<assy>[\\w\\d\\_]*)\\.(?P<seq_level>[\\w]*):\\d*:\\d*:(?P<taxonomy>\\d*):(?P<id>\\d*)[\\s\t]REF$",
         "keys": "seq_type id_type assy seq_level taxonomy id"
     },
-    "fastq_art_illumina": {
-        "pattern": "^@(?P<readid>(?P<reftaxonomyid>\\d*):(?P<refsource>\\w*):(?P<refseqnb>\\d*)-(?P<readnb>\\d*))$",
+    "fastq_art_illumina_ncbi_std": {
+        "pattern": "^@(?P<readid>(?P<reftaxonomyid>\\d*):(?P<refsource>\\w*):(?P<refseqnb>\\d*)-(?P<readnb>\\d*(\\/\\d)?))$",
         "keys": "readid reftaxonomyid refsource refseqnb readnb"
     },
-    "aln_art_illumina": {
-        "pattern": "^>(?P<refseqid>(?P<reftaxonomyid>\\d*):(?P<refsource>\\w*):(?P<refseqnb>\\d*))(\\s|\t)*(?P<readid>(?P=reftaxonomyid):(?P=refsource):(?P=refseqnb)-(?P<readnb>\\d*(\\/\\d(-\\d)?)?))(\\s|\t)(?P<aln_start_pos>\\d*)(\\s|\t)(?P<refseq_strand>(-|\\+))$",
+    "aln_art_illumina_ncbi_std": {
+        "pattern": "^>(?P<refseqid>(?P<reftaxonomyid>\\d*):(?P<refsource>\\w*):(?P<refseqnb>\\d*))(\\s|\t)*(?P<readid>(?P=reftaxonomyid):(?P=refsource):(?P=refseqnb)-(?P<readnb>\\d*(\\/\\d(-\\d)?)?))(\\s|\\t)(?P<aln_start_pos>\\d*)(\\s|\\t)(?P<refseq_strand>(-|\\+))$",
         "keys": "refseqid reftaxonomyid refsource refseqnb readid readnb aln_start_pos refseq_strand"
     },
-    "aln_art_illumina-refseq": {
-        "pattern": "^@SQ[\\t\\s]*(?P<refseqid>(?P<reftaxonomyid>\\d*):(?P<refsource>\\w*):(?P<refseqnb>\\d*))[\\t\\s]*\\[(?P<refseq_accession>[\\d\\w]*)\\][\\t\\s]*(?P=reftaxonomyid)[\\s\\t]*(?P=refsource)[\\s\\t]*(?P=refseqnb)[\\s\\t]*\\[(?P=refseq_accession)\\][\\s\\t]*(?P=reftaxonomyid)[\\s\\t]*(?P<species>\\w[\\w\\d\\/\\s\\-\\.]*)[\\s\\t](?P<refseq_length>\\d*)$",
+    "aln_art_illumina-refseq-ncbi-std": {
+        "pattern": "^@SQ[\\t\\s]*(?P<refseqid>(?P<reftaxonomyid>\\d*):(?P<refsource>\\w*):(?P<refseqnb>\\d*))[\\t\\s]*\\[(?P<refseq_accession>[\\d\\w]*)\\][\\t\\s]*(?P=reftaxonomyid)[\\s\\t]*(?P=refsource)[\\s\\t]*(?P=refseqnb)[\\s\\t]*\\[(?P=refseq_accession)\\][\\s\\t]*(?P=reftaxonomyid)[\\s\\t]*(?P<species>\\w[\\w\\d\\/\\s\\-\\.:]*)[\\s\\t](?P<refseq_length>\\d*)$",
         "keys": "refseqid reftaxonomyid refsource refseqnb refseq_accession species refseq_length"
     }
 }

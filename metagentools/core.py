@@ -320,6 +320,7 @@ class TextFileBaseReader:
         if self.fp is not None:
             self.fp.close()
         self.fp = open(self.path, 'r')
+        self._chunk_nb = 0
         
     def __iter__(self):
         return self
@@ -337,6 +338,7 @@ class TextFileBaseReader:
         lines = []
         for i in range(self.nlines):
             lines.append(self._safe_readline())
+        self._chunk_nb = self._chunk_nb + 1
         return ''.join(lines)
     
     def print_first_chunks(

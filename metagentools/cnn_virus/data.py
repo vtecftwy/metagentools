@@ -39,7 +39,7 @@ PACKAGE_ROOT = Path(__file__).parents[1]
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 15
 class OriginalLabels:
-    """Converts labels to species for original data"""
+    """Converts labels to species name for original data"""
     def __init__(self, p2mapping=None):
         if p2mapping is None:
             p2mapping = ProjectFileSystem().data / 'CNN_Virus_data/virus_name_mapping'
@@ -74,7 +74,12 @@ class FastaFileReader(TextFileBaseReader):
             lines.append(self._safe_readline())
         dfn_line = lines[0].replace('\n', '')   #remove the next line symbol at the end of the line
         sequence = lines[1].replace('\n', '')   #remove the next line symbol at the end of the line
+        self._chunk_nb = self._chunk_nb + 1
         return {'definition line':dfn_line, 'sequence':f"{sequence}"}
+
+    @property
+    def read_nb(self)-> int:
+        return self._chunk_nb
     
     def print_first_chunks(
         self, 
@@ -137,8 +142,12 @@ class FastqFileReader(TextFileBaseReader):
             'read_qscores': f"{lines[3]}",
         }
         output['probs error'] = np.array([q_score2prob_error(q) for q in output['read_qscores']])
-        
+        self._chunk_nb = self._chunk_nb + 1
         return output
+
+    @property
+    def read_nb(self)-> int:
+        return self._chunk_nb
     
     def print_first_chunks(
         self, 
