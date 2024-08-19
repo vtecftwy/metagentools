@@ -53,7 +53,7 @@ class ProjectFileSystem:
     def __init__(
         self, 
         mount_gdrive:bool=True,  # True to mount Google Drive if running on Colab
-        project_file:Path=None  # Path to the project file. If None, use the one saved in the config file
+        project_file:Path=None   # Path to the project file. If None, use the one saved in the config file
         ):
             self.is_colab = 'google.colab' in sys.modules       
             if self.is_colab and mount_gdrive:
@@ -85,6 +85,8 @@ class ProjectFileSystem:
                     warnings.warn(msg)
                 else:
                     self._project_root = Path(path_str)
+            self._data = self.project_root / 'data'
+            self._nbs = self.project_root / 'nbs'
 
     def __call__(self): return self.is_local
 
@@ -150,10 +152,16 @@ class ProjectFileSystem:
             raise ValueError('Not running locally, on Colab or on Kaggle')
 
     @property
-    def data(self): return self.project_root / 'data'
+    def data(self): return self._data
 
+    @data.setter
+    def data(self, folder_name): self._data = self.project_root / folder_name
+    
     @property
     def nbs(self): return self.project_root / 'nbs'        
+
+    @nbs.setter
+    def nbs(self,folder_name): return self.project_root / folder_name
 
     @property
     def p2config(self): return self.home / self._config_dir / self._config_fname
@@ -507,7 +515,7 @@ class TextFileBaseReader:
             self.reset_iterator()
 
 
-# %% ../nbs-dev/00_core.ipynb 76
+# %% ../nbs-dev/00_core.ipynb 77
 class TextFileBaseIterator:
     """`TextFileBaseIterator` is a deprecated class, to be replaced by `TextFileBaseReader`"""
     def __init__(self, *args, **kwargs):
