@@ -79,7 +79,8 @@ class ProjectFileSystem:
                 warnings.warn(msg, UserWarning)
             # Set key directory paths
             self._project_root = Path()
-            if self.is_local:
+            data_dir = 'data'
+            if self.is_local or os.getenv("GITHUB_ACTIONS") == "true":
                 cfg = self.read_config()
                 path_str = cfg.get('Infra', 'project_root', fallback=None)
                 data_dir = cfg.get('Infra', 'data_dir', fallback='data')
@@ -91,7 +92,7 @@ class ProjectFileSystem:
                     warnings.warn(msg)
                 else:
                     self._project_root = Path(path_str)
-            self._data = self.project_root / str(data_dir)
+            self._data = self.project_root / data_dir
             self._nbs = self.project_root / 'nbs'
 
     def __call__(self): return self.is_local
