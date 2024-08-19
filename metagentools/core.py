@@ -156,6 +156,8 @@ class ProjectFileSystem:
             return self._project_root
         elif self.is_colab:
             return self.gdrive / self._shared_project_dir
+        elif os.getenv("GITHUB_ACTIONS") == "true":
+            return self._project_root
         elif self.is_kaggle:
             raise NotImplemented(f"ProjectFileSystem is not implemented for Kaggle yet")
         else:
