@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Base classes, functions and other objects used across the package.">
+
+<title>core – metagentools</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="core – metagentools">
+<meta property="og:description" content="Base classes, functions and other objects used across the package.">
+<meta property="og:site_name" content="metagentools">
+<meta name="twitter:title" content="core – metagentools">
+<meta name="twitter:description" content="Base classes, functions and other objects used across the package.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">metagentools</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">General Code</a></li><li class="breadcrumb-item"><a href="./core.html">core</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">metagentools</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">General Code</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">core</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wandb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">wandb</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./art.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">art</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bio</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">CNN Virus</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cnn_virus_architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">architecture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cnn_virus_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cnn_virus_utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">utils</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#utility-classes-and-functions" id="toc-utility-classes-and-functions" class="nav-link active" data-scroll-target="#utility-classes-and-functions">Utility Classes and Functions</a>
+  <ul class="collapse">
+  <li><a href="#handling-files-and-file-structure" id="toc-handling-files-and-file-structure" class="nav-link" data-scroll-target="#handling-files-and-file-structure">Handling files and file structure</a>
+  <ul class="collapse">
+  <li><a href="#projectfilesystem" id="toc-projectfilesystem" class="nav-link" data-scroll-target="#projectfilesystem">ProjectFileSystem</a></li>
+  <li><a href="#projectfilesystem.info" id="toc-projectfilesystem.info" class="nav-link" data-scroll-target="#projectfilesystem.info">ProjectFileSystem.info</a></li>
+  <li><a href="#projectfilesystem.readme" id="toc-projectfilesystem.readme" class="nav-link" data-scroll-target="#projectfilesystem.readme">ProjectFileSystem.readme</a></li>
+  <li><a href="#projectfilesystem.register_as_local" id="toc-projectfilesystem.register_as_local" class="nav-link" data-scroll-target="#projectfilesystem.register_as_local">ProjectFileSystem.register_as_local</a></li>
+  <li><a href="#projectfilesystem.set_project_root" id="toc-projectfilesystem.set_project_root" class="nav-link" data-scroll-target="#projectfilesystem.set_project_root">ProjectFileSystem.set_project_root</a></li>
+  <li><a href="#projectfilesystem.read_config" id="toc-projectfilesystem.read_config" class="nav-link" data-scroll-target="#projectfilesystem.read_config">ProjectFileSystem.read_config</a></li>
+  </ul></li>
+  <li><a href="#other-utility-classes" id="toc-other-utility-classes" class="nav-link" data-scroll-target="#other-utility-classes">Other utility classes</a>
+  <ul class="collapse">
+  <li><a href="#jsondict" id="toc-jsondict" class="nav-link" data-scroll-target="#jsondict">JsonDict</a></li>
+  <li><a href="#jsonfilereader" id="toc-jsonfilereader" class="nav-link" data-scroll-target="#jsonfilereader">JsonFileReader</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#base-classes" id="toc-base-classes" class="nav-link" data-scroll-target="#base-classes">Base Classes</a>
+  <ul class="collapse">
+  <li><a href="#file-readers" id="toc-file-readers" class="nav-link" data-scroll-target="#file-readers">File Readers</a>
+  <ul class="collapse">
+  <li><a href="#textfilebasereader" id="toc-textfilebasereader" class="nav-link" data-scroll-target="#textfilebasereader">TextFileBaseReader</a></li>
+  <li><a href="#textfilebasereader.reset_iterator" id="toc-textfilebasereader.reset_iterator" class="nav-link" data-scroll-target="#textfilebasereader.reset_iterator">TextFileBaseReader.reset_iterator</a></li>
+  <li><a href="#textfilebasereader.print_first_chunks" id="toc-textfilebasereader.print_first_chunks" class="nav-link" data-scroll-target="#textfilebasereader.print_first_chunks">TextFileBaseReader.print_first_chunks</a></li>
+  <li><a href="#textfilebasereader.parse_text" id="toc-textfilebasereader.parse_text" class="nav-link" data-scroll-target="#textfilebasereader.parse_text">TextFileBaseReader.parse_text</a></li>
+  </ul></li>
+  <li><a href="#extending-the-base-class" id="toc-extending-the-base-class" class="nav-link" data-scroll-target="#extending-the-base-class">Extending the base class</a>
+  <ul class="collapse">
+  <li><a href="#textfilebasereader.set_parsing_rules" id="toc-textfilebasereader.set_parsing_rules" class="nav-link" data-scroll-target="#textfilebasereader.set_parsing_rules">TextFileBaseReader.set_parsing_rules</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#deprecated-items" id="toc-deprecated-items" class="nav-link" data-scroll-target="#deprecated-items">Deprecated Items</a>
+  <ul class="collapse">
+  <li><a href="#textfilebaseiterator" id="toc-textfilebaseiterator" class="nav-link" data-scroll-target="#textfilebaseiterator">TextFileBaseIterator</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/vtecftwy/metagentools/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">General Code</a></li><li class="breadcrumb-item"><a href="./core.html">core</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">core</h1>
+</div>
+
+<div>
+  <div class="description">
+    Base classes, functions and other objects used across the package.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>This module includes all base classes, functions and other objects that are used across the package. It is imported by all other modules in the package.</p>
+<p><code>core</code> includes utility classes and functions to make it easier to work with the complex file systems adopted for the project, as well as base classes such as a file reader with additional functionality.</p>
+<section id="utility-classes-and-functions" class="level1">
+<h1>Utility Classes and Functions</h1>
+<section id="handling-files-and-file-structure" class="level2">
+<h2 class="anchored" data-anchor-id="handling-files-and-file-structure">Handling files and file structure</h2>
+<p>Utility classes to represent</p>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L30" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="projectfilesystem" class="level3">
+<h3 class="anchored" data-anchor-id="projectfilesystem">ProjectFileSystem</h3>
+<blockquote class="blockquote">
+<pre><code> ProjectFileSystem (*args, **kwargs)</code></pre>
+</blockquote>
+<p>*Represent a project file system, return paths to key directories, provide methods to manage the file system.</p>
+<ul>
+<li>Paths to key directories are based on whether the code is running locally or in the cloud.</li>
+<li>First time it is used on a local computer, it must be registered as local and a project root path must be set.</li>
+<li>A user configuration file is created in the user’s home directory to store the project root path and whether the machine is local or not.</li>
+</ul>
+<blockquote class="blockquote">
+<p>Technical note: <a href="https://vtecftwy.github.io/metagentools/core.html#projectfilesystem"><code>ProjectFileSystem</code></a> is a simpleton class*</p>
+</blockquote>
+<p><strong>Reference Project File System</strong>:</p>
+<p>This project adopts a unified file structure to make coding and colaboration easier. In addition, we can run the code locally (from a <code>project-root</code> directory) or in the cloud (colab, kaggle, others).</p>
+<p>The unified file structure when running localy is:</p>
+<pre class="text"><code>    project-root   
+        |--- data
+        |      |--- CNN_Virus_data  (all data from CNN Virus original paper)
+        |      |--- saved           (trained and finetuned models, saved preprocessed datasets)
+        |      |--- ....            (raw or pre-processed data from various sources, results, ... )  
+        |      
+        |--- nbs  (all reference and work notebooks)
+        |      |--- cnn_virus
+        |      |        |--- notebooks.ipynb</code></pre>
+<p>When running on <em>google colab</em>, it is assumed that a google drive is mounted on the colab server instance, and that this google drive root includes a shortcut named <code>Metagenomics</code> and pointing to the project shared directory. The project shared directory is accessible <a href="./https://drive.google.com/drive/folders/134uei5fmt08TpzhmjG4sW0FQ06kn2ZfZ">here</a> if you are an authorized project member.</p>
+<p><strong><a href="https://vtecftwy.github.io/metagentools/core.html#projectfilesystem"><code>ProjectFileSystem</code></a> at work</strong>:</p>
+<p>If you use this class for the first time on a local computer, read the two <strong>Important Notes</strong> below.</p>
+<div id="cell-9" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pfs <span class="op">=</span> ProjectFileSystem()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once created, the instance of <a href="https://vtecftwy.github.io/metagentools/core.html#projectfilesystem"><code>ProjectFileSystem</code></a> gives access to key directories’ paths:</p>
+<ul>
+<li><code>project root</code>: <code>Path</code> to the project root directory</li>
+<li><code>data</code>: <code>Path</code> to the data directory</li>
+<li><code>nbs</code>: <code>Path</code> to the notebooks directory</li>
+</ul>
+<p>It also provides additional information regarding the computer on which the code is running:</p>
+<ul>
+<li><code>os</code>: a string providing the name of the operating system the code is running on</li>
+<li><code>is_colab</code>: True if the code is running on google colab</li>
+<li><code>is_kaggle</code>: True if the code is running on kaggle server (NOT IMPLEMENTED YET)</li>
+<li><code>is_local</code>: True if the code is running on a computer registered as local</li>
+</ul>
+<div id="cell-11" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> [pfs.project_root, pfs.data, pfs.nbs]:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>/home/vtec/projects/bio/metagentools
+/home/vtec/projects/bio/metagentools/data
+/home/vtec/projects/bio/metagentools/nbs</code></pre>
+</div>
+</div>
+<div id="cell-12" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"OSL </span><span class="sc">{</span>pfs<span class="sc">.</span>os<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Local: </span><span class="sc">{</span>pfs<span class="sc">.</span>is_local<span class="sc">}</span><span class="ss">, Colab: </span><span class="sc">{</span>pfs<span class="sc">.</span>is_colab<span class="sc">}</span><span class="ss">, Kaggle: </span><span class="sc">{</span>pfs<span class="sc">.</span>is_kaggle<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OSL linux
+Local: True, Colab: False, Kaggle: False</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L100" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="projectfilesystem.info" class="level3">
+<h3 class="anchored" data-anchor-id="projectfilesystem.info">ProjectFileSystem.info</h3>
+<blockquote class="blockquote">
+<pre><code> ProjectFileSystem.info ()</code></pre>
+</blockquote>
+<p><em>Print basic info on the file system and the device</em></p>
+<div id="cell-14" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pfs.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Running linux on local computer
+Device's home directory: /home/vtec
+Project file structure:
+ - Root ........ /home/vtec/projects/bio/metagentools 
+ - Data Dir .... /home/vtec/projects/bio/metagentools/data 
+ - Notebooks ... /home/vtec/projects/bio/metagentools/nbs</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L199" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="projectfilesystem.readme" class="level3">
+<h3 class="anchored" data-anchor-id="projectfilesystem.readme">ProjectFileSystem.readme</h3>
+<blockquote class="blockquote">
+<pre><code> ProjectFileSystem.readme (dir_path:pathlib.Path=None)</code></pre>
+</blockquote>
+<p>*Display <code>readme.md</code> file or any other <code>.md</code> file in <code>dir_path</code>.</p>
+<p>This provides a convenient way to get information on each direcotry content*</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dir_path</td>
+<td>Path</td>
+<td>None</td>
+<td>Path to the directory to inquire. If None, display readme file from project_root.</td>
+</tr>
+</tbody>
+</table>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pfs.readme(Path(<span class="st">'data_dev'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<hr>
+</div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p>ReadMe file for directory <code>/home/vtec/projects/bio/metagentools/nbs-dev/data_dev</code>:</p>
+</div>
+<div class="cell-output cell-output-display">
+<hr>
+</div>
+<section id="data-directory-for-metagentools-development" class="level3 cell-output cell-output-display cell-output-markdown">
+<h3 class="anchored" data-anchor-id="data-directory-for-metagentools-development">Data directory for <code>metagentools</code> development</h3>
+<p>This directory includes all the data required to test and validate <code>metagentools</code> code.</p>
+<pre class="text"><code>data_dev
+ |--- CNN_Virus_data
+ |     |--- 50mer_ds_100_seq
+ |     |--- 150mer_ds_100_seq
+ |     |--- train_short
+ |     |--- val_short
+ |     |--- weight_of_classes
+ |--- ncbi
+ |     |--- infer_results
+ |     |     |--- cnn_virus
+ |     |     |--- csv
+ |     |     |--- xlsx
+ |     |--- refsequences
+ |     |     |--- cov
+ |     |     |     |--- another_sequence.fa
+ |     |     |     |--- cov_virus_sequences_one.fa
+ |     |     |     |--- cov_virus_sequences_two.fa
+ |     |     |     |--- sequences_two_no_matching_rule.fa
+ |     |--- simreads
+ |     |     |--- cov
+ |     |     |     |--- paired_1seq_50bp
+ |     |     |     |      |--- paired_1seq_50bp_1.aln
+ |     |     |     |      |--- paired_1seq_50bp_1.fq
+ |     |     |     |--- single_1seq_50bp
+ |     |     |     |      |--- single_1seq_50bp_1.aln
+ |     |     |     |      |--- single_1seq_50bp_1.fq
+ |--- ....           
+ |--- readme.md               </code></pre>
+</section>
+<div class="cell-output cell-output-display">
+<hr>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Important Note 1</strong>:</p>
+<p>When using the package on a local computer for the <strong>first time</strong>, you must register the computer as a local computer. Otherwise, <a href="https://vtecftwy.github.io/metagentools/core.html#projectfilesystem"><code>ProjectFileSystem</code></a> will raise an error. Once registered, the configuration file will be updated and <a href="https://vtecftwy.github.io/metagentools/core.html#projectfilesystem"><code>ProjectFileSystem</code></a> will detect that and run without error.</p>
+</blockquote>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L116" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="projectfilesystem.register_as_local" class="level3">
+<h3 class="anchored" data-anchor-id="projectfilesystem.register_as_local">ProjectFileSystem.register_as_local</h3>
+<blockquote class="blockquote">
+<pre><code> ProjectFileSystem.register_as_local ()</code></pre>
+</blockquote>
+<p><em>Update the configuration file to register the machine as local machine</em></p>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>cfg <span class="op">=</span> pfs.register_as_local()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Important Note 2</strong>:</p>
+<p>When using the package on a local computer for the <strong>first time</strong>, it is also required to <em>set the project root directory</em>. This is necessary to allow users to locate their local project folder anywhere they want. Once set, the path to the project root will be saved in the configuratin file.</p>
+</blockquote>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L125" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="projectfilesystem.set_project_root" class="level3">
+<h3 class="anchored" data-anchor-id="projectfilesystem.set_project_root">ProjectFileSystem.set_project_root</h3>
+<blockquote class="blockquote">
+<pre><code> ProjectFileSystem.set_project_root (p2project:str|pathlib.Path,
+                                     data_dir:str='data')</code></pre>
+</blockquote>
+<p><em>Update the configuration file to set the project root</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>p2project</td>
+<td>str | pathlib.Path</td>
+<td></td>
+<td>string or Path to the project directory. Can be absolute or relative to home</td>
+</tr>
+<tr class="even">
+<td>data_dir</td>
+<td>str</td>
+<td>data</td>
+<td>Directory name for data under project root</td>
+</tr>
+</tbody>
+</table>
+<div id="cell-22" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pfs.set_project_root(<span class="st">'/home/vtec/projects/bio/metagentools/'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Project Root set to:   /home/vtec/projects/bio/metagentools
+Data directory set to: /home/vtec/projects/bio/metagentools/data</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L107" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="projectfilesystem.read_config" class="level3">
+<h3 class="anchored" data-anchor-id="projectfilesystem.read_config">ProjectFileSystem.read_config</h3>
+<blockquote class="blockquote">
+<pre><code> ProjectFileSystem.read_config ()</code></pre>
+</blockquote>
+<p><em>Read config from the configuration file if it exists and return an empty config if does not</em></p>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>cfg <span class="op">=</span> pfs.read_config()</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>cfg[<span class="st">'Infra'</span>][<span class="st">'registered_as_local'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'True'</code></pre>
+</div>
+</div>
+<div id="cell-25" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>cfg[<span class="st">'Infra'</span>][<span class="st">'project_root'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'/home/vtec/projects/bio/metagentools'</code></pre>
+</div>
+</div>
+<div id="cell-26" class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>cfg[<span class="st">'Infra'</span>][<span class="st">'data_dir'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'data'</code></pre>
+</div>
+</div>
+<p><strong>Technical Note for Developpers</strong></p>
+<p>The current notebook and all other development notebooks use a minimum set of data that comes with the repository under <code>nbs-dev/data_dev</code> instead of the standard <code>data</code> directory which is much too large for testing and developing.</p>
+<p>Therefore, when creating the instance of <a href="https://vtecftwy.github.io/metagentools/core.html#projectfilesystem"><code>ProjectFileSystem</code></a>, use the parameter <code>config_file</code> to pass a specific development configuration, also coming with the repository.</p>
+<div id="cell-28" class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>p2dev_cfg <span class="op">=</span> PACKAGE_ROOT <span class="op">/</span> <span class="st">'nbs-dev/metagentools-dev.cfg'</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>pfs <span class="op">=</span> ProjectFileSystem(config_fname<span class="op">=</span>p2dev_cfg)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>pfs.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Running linux on local computer
+Device's home directory: /home/vtec
+Project file structure:
+ - Root ........ /home/vtec/projects/bio/metagentools 
+ - Data Dir .... /home/vtec/projects/bio/metagentools/nbs-dev/data_dev 
+ - Notebooks ... /home/vtec/projects/bio/metagentools/nbs</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="other-utility-classes" class="level2">
+<h2 class="anchored" data-anchor-id="other-utility-classes">Other utility classes</h2>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L235" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="jsondict" class="level3">
+<h3 class="anchored" data-anchor-id="jsondict">JsonDict</h3>
+<blockquote class="blockquote">
+<pre><code> JsonDict (p2json:str|pathlib.Path, dictionary:dict=None)</code></pre>
+</blockquote>
+<p>*Dictionary whose current value is mirrored in a json file and can be initated from a json file</p>
+<p><a href="https://vtecftwy.github.io/metagentools/core.html#jsondict"><code>JsonDict</code></a> requires a path to json file at creation. An optional dict can be passed as argument.</p>
+<p>Behavior at creation:</p>
+<ul>
+<li><code>JsonDict(p2json, dict)</code> will create a <a href="https://vtecftwy.github.io/metagentools/core.html#jsondict"><code>JsonDict</code></a> with key-values from <code>dict</code>, and mirrored in <code>p2json</code></li>
+<li><code>JsonDict(p2json)</code> will create a <a href="https://vtecftwy.github.io/metagentools/core.html#jsondict"><code>JsonDict</code></a> with empty dictionary and load json content if file exists</li>
+</ul>
+<p>Once created, <a href="https://vtecftwy.github.io/metagentools/core.html#jsondict"><code>JsonDict</code></a> instances behave exactly as a dictionary*</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>p2json</td>
+<td>str | pathlib.Path</td>
+<td></td>
+<td>path to the json file to mirror with the dictionary</td>
+</tr>
+<tr class="even">
+<td>dictionary</td>
+<td>dict</td>
+<td>None</td>
+<td>optional dictionary to initialize the JsonDict</td>
+</tr>
+</tbody>
+</table>
+<p>Create a new dictionary mirrored to a JSON file:</p>
+<div id="cell-32" class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> {<span class="st">'a'</span>: <span class="dv">1</span>, <span class="st">'b'</span>: <span class="dv">2</span>, <span class="st">'c'</span>: <span class="dv">3</span>}</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>p2json <span class="op">=</span> pfs.data <span class="op">/</span> <span class="st">'jsondict-test.json'</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>jsond <span class="op">=</span> JsonDict(p2json, d)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>jsond</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'a': 1, 'b': 2, 'c': 3}
+dict mirrored in /home/vtec/projects/bio/metagentools/nbs-dev/data_dev/jsondict-test.json</code></pre>
+</div>
+</div>
+<p>Once created, the <code>JsonFile</code> instance behaves exactly like a dictionary, with the added benefit that any change to the dictionary is automatically saved to the JSON file.</p>
+<div id="cell-34" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>jsond[<span class="st">'a'</span>], jsond[<span class="st">'b'</span>], jsond[<span class="st">'c'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(1, 2, 3)</code></pre>
+</div>
+</div>
+<div id="cell-35" class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, v <span class="kw">in</span> jsond.items():</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"key: </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">; value: </span><span class="sc">{</span>v<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>key: a; value: 1
+key: b; value: 2
+key: c; value: 3</code></pre>
+</div>
+</div>
+<p>Adding or removing a value from the dictionary works in the same way as for a normal dictionary. But the json file is automatically updated.</p>
+<div id="cell-37" class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>jsond[<span class="st">'d'</span>] <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>jsond</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'a': 1, 'b': 2, 'c': 3, 'd': 4}
+dict mirrored in /home/vtec/projects/bio/metagentools/nbs-dev/data_dev/jsondict-test.json</code></pre>
+</div>
+</div>
+<div id="cell-38" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(p2json, <span class="st">'r'</span>) <span class="im">as</span> fp:</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(fp.read())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+    "a": 1,
+    "b": 2,
+    "c": 3,
+    "d": 4
+}</code></pre>
+</div>
+</div>
+<div id="cell-39" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> jsond[<span class="st">'a'</span>]</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>jsond</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'b': 2, 'c': 3, 'd': 4}
+dict mirrored in /home/vtec/projects/bio/metagentools/nbs-dev/data_dev/jsondict-test.json</code></pre>
+</div>
+</div>
+<div id="cell-40" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(p2json, <span class="st">'r'</span>) <span class="im">as</span> fp:</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(fp.read())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+    "b": 2,
+    "c": 3,
+    "d": 4
+}</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L288" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="jsonfilereader" class="level3">
+<h3 class="anchored" data-anchor-id="jsonfilereader">JsonFileReader</h3>
+<blockquote class="blockquote">
+<pre><code> JsonFileReader (path:str|pathlib.Path)</code></pre>
+</blockquote>
+<p><em>Mirror a JSON file and a dictionary</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>path to the json file</td>
+</tr>
+</tbody>
+</table>
+<div id="cell-42" class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>jd <span class="op">=</span> JsonFileReader(pfs.data <span class="op">/</span> <span class="st">'test.json'</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>pprint(jd.d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'item 1': {'keys': 'key key key key', 'pattern': 'pattern 1'},
+ 'item 2': {'keys': 'key key key key', 'pattern': 'pattern 2'},
+ 'item 3': {'keys': 'key key key key', 'pattern': 'pattern 3'}}</code></pre>
+</div>
+</div>
+<p>Now we can add an item to the dictionary/json</p>
+<div id="cell-44" class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>new_item <span class="op">=</span> {<span class="st">'keys'</span>: <span class="st">'key key key key'</span>, <span class="st">'pattern'</span>: <span class="st">'another pattern'</span>}</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>jd.add_item(key<span class="op">=</span><span class="st">'another item'</span>, item<span class="op">=</span>new_item)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'item 1': {'keys': 'key key key key', 'pattern': 'pattern 1'},
+ 'item 2': {'keys': 'key key key key', 'pattern': 'pattern 2'},
+ 'item 3': {'keys': 'key key key key', 'pattern': 'pattern 3'},
+ 'another item': {'keys': 'key key key key', 'pattern': 'another pattern'}}</code></pre>
+</div>
+</div>
+<p>After saving the updated JSON file, we can load it again and see the changes.</p>
+<div id="cell-46" class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>jd.save_to_file()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-47" class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>jd <span class="op">=</span> JsonFileReader(pfs.data <span class="op">/</span> <span class="st">'test.json'</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>pprint(jd.d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'another item': {'keys': 'key key key key', 'pattern': 'another pattern'},
+ 'item 1': {'keys': 'key key key key', 'pattern': 'pattern 1'},
+ 'item 2': {'keys': 'key key key key', 'pattern': 'pattern 2'},
+ 'item 3': {'keys': 'key key key key', 'pattern': 'pattern 3'}}</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="base-classes" class="level1">
+<h1>Base Classes</h1>
+<section id="file-readers" class="level2">
+<h2 class="anchored" data-anchor-id="file-readers">File Readers</h2>
+<p>Base classes to be extended in order to create readers for specific file formats.</p>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L314" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="textfilebasereader" class="level3">
+<h3 class="anchored" data-anchor-id="textfilebasereader">TextFileBaseReader</h3>
+<blockquote class="blockquote">
+<pre><code> TextFileBaseReader (path:str|pathlib.Path, nlines:int=1)</code></pre>
+</blockquote>
+<p>*Iterator going through a text file by chunks of <code>nlines</code> lines. Iterator can be reset to file start.</p>
+<p>The class is mainly intented to be extended, as it is for handling sequence files of various formats such as <a href="https://vtecftwy.github.io/metagentools/cnn_virus_data.html#fastafilereader"><code>FastaFileReader</code></a>.*</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td></td>
+<td>path to the file</td>
+</tr>
+<tr class="even">
+<td>nlines</td>
+<td>int</td>
+<td>1</td>
+<td>number of lines on one chunk</td>
+</tr>
+</tbody>
+</table>
+<p>Once initialized, the iterator runs over each chunk of line(s) in the text file, sequentially.</p>
+<div id="cell-53" class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>pfs.data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Path('/home/vtec/projects/bio/metagentools/nbs-dev/data_dev')</code></pre>
+</div>
+</div>
+<div id="cell-54" class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>p2textfile <span class="op">=</span> pfs.data <span class="op">/</span> <span class="st">'CNN_Virus_data/train_short'</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>it <span class="op">=</span> TextFileBaseReader(path<span class="op">=</span>p2textfile, nlines<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>one_iteration <span class="op">=</span> <span class="bu">next</span>(it)</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(one_iteration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TCAAAATAATCAGAAATGTTGAACCTAGGGTTGGACACATAATGACCAGC  76  0
+ATTGTTTAACAATTTGTGCTCGTCCCGGTCACCCGCATCCAATCTTGATG  4   9
+AATCTTGTCCTATCCTACCCGCAGGGGAATTGATGATAGANGTGCTTTTA  181 0
+</code></pre>
+</div>
+</div>
+<p>Let’s create a new instance of the file reader, and get several iterations.</p>
+<div id="cell-56" class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>it <span class="op">=</span> TextFileBaseReader(path<span class="op">=</span>p2textfile, nlines<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>one_iteration <span class="op">=</span> <span class="bu">next</span>(it)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(one_iteration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TCAAAATAATCAGAAATGTTGAACCTAGGGTTGGACACATAATGACCAGC  76  0
+ATTGTTTAACAATTTGTGCTCGTCCCGGTCACCCGCATCCAATCTTGATG  4   9
+AATCTTGTCCTATCCTACCCGCAGGGGAATTGATGATAGANGTGCTTTTA  181 0
+</code></pre>
+</div>
+</div>
+<div id="cell-57" class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>another_iteration <span class="op">=</span> <span class="bu">next</span>(it)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(another_iteration)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>one_more_iteration <span class="op">=</span> <span class="bu">next</span>(it)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(one_more_iteration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>GGAGCGGAGCCAACCCCTATGCTCACTTGCAACCCAAGGGGCGTTCCAGT  74  3
+TGGATCCTGCGCGGGACGTCCTTTGTCTACGTCCCGTCGGCGCATCCCGC  60  3
+GAGAGACTTACTAAAAAGCTGGCACTTACCATCAGTGTTTCACCTACATG  44  0
+
+ACACACGACACTAGAGATAATGTGTCAGTGGATTATAAACAAACCAAGTT  43  7
+TTGTAGCATAAGAACTGGTCTTCGCTGAAATTCTTGTCTTGATCTCATCT  35  2
+TGGCCCTGCGGTCTGGGGCCCAGAAGCATATGTCAAGTCCTTTGAGAAGT  73  4
+</code></pre>
+</div>
+</div>
+<p>If we want to access the start of the file again, we need to re-initialize the file handle.</p>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L341" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="textfilebasereader.reset_iterator" class="level3">
+<h3 class="anchored" data-anchor-id="textfilebasereader.reset_iterator">TextFileBaseReader.reset_iterator</h3>
+<blockquote class="blockquote">
+<pre><code> TextFileBaseReader.reset_iterator ()</code></pre>
+</blockquote>
+<p><em>Reset the iterator to point to the first line in the file.</em></p>
+<div id="cell-60" class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>it.reset_iterator()</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>one_iteration <span class="op">=</span> <span class="bu">next</span>(it)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(one_iteration)</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>another_iteration <span class="op">=</span> <span class="bu">next</span>(it)</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(another_iteration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TCAAAATAATCAGAAATGTTGAACCTAGGGTTGGACACATAATGACCAGC  76  0
+ATTGTTTAACAATTTGTGCTCGTCCCGGTCACCCGCATCCAATCTTGATG  4   9
+AATCTTGTCCTATCCTACCCGCAGGGGAATTGATGATAGANGTGCTTTTA  181 0
+
+GGAGCGGAGCCAACCCCTATGCTCACTTGCAACCCAAGGGGCGTTCCAGT  74  3
+TGGATCCTGCGCGGGACGTCCTTTGTCTACGTCCCGTCGGCGCATCCCGC  60  3
+GAGAGACTTACTAAAAAGCTGGCACTTACCATCAGTGTTTCACCTACATG  44  0
+</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L367" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="textfilebasereader.print_first_chunks" class="level3">
+<h3 class="anchored" data-anchor-id="textfilebasereader.print_first_chunks">TextFileBaseReader.print_first_chunks</h3>
+<blockquote class="blockquote">
+<pre><code> TextFileBaseReader.print_first_chunks (nchunks:int=3)</code></pre>
+</blockquote>
+<p>*Print the first <code>nchunk</code> chunks of text from the file.</p>
+<p>After printing, the iterator is reset again to its first line.*</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>nchunks</td>
+<td>int</td>
+<td>3</td>
+<td>number of chunks to print</td>
+</tr>
+</tbody>
+</table>
+<div id="cell-62" class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>it <span class="op">=</span> TextFileBaseReader(path<span class="op">=</span>p2textfile, nlines<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>it.print_first_chunks(nchunks<span class="op">=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3-line chunk 1
+TCAAAATAATCAGAAATGTTGAACCTAGGGTTGGACACATAATGACCAGC  76  0
+ATTGTTTAACAATTTGTGCTCGTCCCGGTCACCCGCATCCAATCTTGATG  4   9
+AATCTTGTCCTATCCTACCCGCAGGGGAATTGATGATAGANGTGCTTTTA  181 0
+
+3-line chunk 2
+GGAGCGGAGCCAACCCCTATGCTCACTTGCAACCCAAGGGGCGTTCCAGT  74  3
+TGGATCCTGCGCGGGACGTCCTTTGTCTACGTCCCGTCGGCGCATCCCGC  60  3
+GAGAGACTTACTAAAAAGCTGGCACTTACCATCAGTGTTTCACCTACATG  44  0
+
+3-line chunk 3
+ACACACGACACTAGAGATAATGTGTCAGTGGATTATAAACAAACCAAGTT  43  7
+TTGTAGCATAAGAACTGGTCTTCGCTGAAATTCTTGTCTTGATCTCATCT  35  2
+TGGCCCTGCGGTCTGGGGCCCAGAAGCATATGTCAAGTCCTTTGAGAAGT  73  4
+</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L406" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="textfilebasereader.parse_text" class="level3">
+<h3 class="anchored" data-anchor-id="textfilebasereader.parse_text">TextFileBaseReader.parse_text</h3>
+<blockquote class="blockquote">
+<pre><code> TextFileBaseReader.parse_text (txt:str, pattern:str=None,
+                                keys:list[str]=None)</code></pre>
+</blockquote>
+<p>*Parse text using regex pattern and keys. Return a metadata dictionary.</p>
+<p>The passed text is parsed using the regex pattern. The method return a dictionary in the format:</p>
+<pre><code>{
+    'key_1': 'metadata 1',
+    'key_2': 'metadata 2',
+    ...
+}*</code></pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>txt</td>
+<td>str</td>
+<td></td>
+<td>text to parse</td>
+</tr>
+<tr class="even">
+<td>pattern</td>
+<td>str</td>
+<td>None</td>
+<td>If None, uses standard regex pattern to extract metadata, otherwise, uses passed regex</td>
+</tr>
+<tr class="odd">
+<td>keys</td>
+<td>list</td>
+<td>None</td>
+<td>If None, uses standard regex list of keys, otherwise, uses passed list of keys (str)</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>dict</strong></td>
+<td></td>
+<td><strong>parsed metadata in key/value format</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="cell-64" class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> <span class="st">'&gt;2591237:ncbi:1'</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>pattern <span class="op">=</span> <span class="vs">r"^&gt;(?P&lt;id&gt;\d+):(?P&lt;source&gt;ncbi):(?P&lt;nb&gt;\d*)"</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>keys <span class="op">=</span> <span class="st">"id source nb"</span>.split(<span class="st">' '</span>)</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>it.parse_text(text, pattern, keys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'id': '2591237', 'nb': '1', 'source': 'ncbi'}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="extending-the-base-class" class="level2">
+<h2 class="anchored" data-anchor-id="extending-the-base-class">Extending the base class</h2>
+<p><a href="https://vtecftwy.github.io/metagentools/core.html#textfilebasereader"><code>TextFileBaseReader</code></a> is a base class, intended to be extended into specific file format readers.</p>
+<p>The following methods will typically be extended to match data file and other structured text files formats:</p>
+<ul>
+<li><code>__next__</code> method in order to customize how the iterator parses files into “elements”. For instance, in a FASTA file, one element consists of two lines: a <em>“definition line”</em> and the <em>sequence</em> itself. Extending <a href="https://vtecftwy.github.io/metagentools/core.html#textfilebasereader"><code>TextFileBaseReader</code></a> allows to read pairs of lines sequentially and return an element as a dictionary. For instance, <a href="https://vtecftwy.github.io/metagentools/cnn_virus_data.html#fastafilereader"><code>FastaFileReader</code></a> iterates over each pairs of lines in a Fasta file and return each pair as a dictionary as follows:</li>
+</ul>
+<pre class="text"><code>    {
+    'definition line': '&gt;2591237:ncbi:1 [MK211378]\t2591237\tncbi\t1 [MK211378] '
+                       '2591237\tCoronavirus BtRs-BetaCoV/YN2018D\t\tscientific '
+                       'name\n',
+    'sequence':        'TATTAGGTTTTCTACCTACCCAGGA'
+    }</code></pre>
+<ul>
+<li>Methods for parsing metadata from the file. For instance, <code>parse_file</code> method will handle how the reader will iterate over the full file and return a dictionary for the entire file.</li>
+<li>Extended classes will also define a specific attributes (<code>text_to_parse_key</code>, <code>re_pattern</code>, <code>re_keys</code>, …)</li>
+</ul>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L434" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="textfilebasereader.set_parsing_rules" class="level3">
+<h3 class="anchored" data-anchor-id="textfilebasereader.set_parsing_rules">TextFileBaseReader.set_parsing_rules</h3>
+<blockquote class="blockquote">
+<pre><code> TextFileBaseReader.set_parsing_rules (pattern:str|bool=None,
+                                       keys:list[str]=None,
+                                       verbose:bool=False)</code></pre>
+</blockquote>
+<p>*Set the standard regex parsing rule for the file.</p>
+<p>Rules can be set:</p>
+<ol type="1">
+<li>manually by passing specific custom values for <code>pattern</code> and <code>keys</code></li>
+<li>automatically, by testing all parsing rules saved in <code>parsing_rule.json</code></li>
+</ol>
+<p>Automatic selection of parsing rules works by testing each rule saved in <code>parsing_rule.json</code> on the first definition line of the fasta file, and selecting the one rule that generates the most metadata matches.</p>
+<p>Rules consists of two parameters:</p>
+<ul>
+<li>The regex pattern including one <code>group</code> for each metadata item, e.g <code>(?P&lt;group_name&gt;regex_code)</code></li>
+<li>The list of keys, i.e.&nbsp;the list with the name of each regex groups, used as key in the metadata dictionary</li>
+</ul>
+<p>This method updates the three following class attributes: <code>re_rule_name</code>, <code>re_pattern</code>, <code>re_keys</code>*</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pattern</td>
+<td>str | bool</td>
+<td>None</td>
+<td>regex pattern to apply to parse the text, search in parsing rules json if None</td>
+</tr>
+<tr class="even">
+<td>keys</td>
+<td>list</td>
+<td>None</td>
+<td>list of keys/group for regex, search in parsing rules json if None</td>
+</tr>
+<tr class="odd">
+<td>verbose</td>
+<td>bool</td>
+<td>False</td>
+<td>when True, provides information on each rule</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>None</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p><strong>Important Note to Developpers</strong></p>
+<p>Method <code>set_parsing_rules</code> is there to allow <a href="https://vtecftwy.github.io/metagentools/core.html#textfilebasereader"><code>TextFileBaseReader</code></a>’s descendant classes to automatically select parsing rule by applying rules saved in a json file to a string extracted from the first element in the file.</p>
+<p>It assumes that the iterator returns its elements as dictionaries <code>{section_name:section, ...}</code> and not as a pure string. The key <code>self.text_to_parse_key</code> will then be used to extract the text to parse for testing the rules. The base class iterator returns a simple string and <code>self.text_to_parse_key</code> is set to <code>None</code>.</p>
+<p>To make setting up a default parsing rule for the reader instance, the iterator must return a dictionary and <code>self.text_to_parse_key</code> must be set to the key in the dictionary corresponding the the text to parse.</p>
+<p>See implementation in <a href="https://vtecftwy.github.io/metagentools/cnn_virus_data.html#fastafilereader"><code>FastaFileReader</code></a>.</p>
+<p>Calling <code>set_parsing_rules</code> on a class that does not satisfy with these characteristics will do nothing and return a warning.</p>
+</blockquote>
+<div id="cell-69" class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>it.set_parsing_rules()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/tmp/ipykernel_2808/3478964930.py:154: UserWarning: 
+            `text_to_parse_key` is not defined in this class. 
+            It is not possible to set a parsing rule.
+            
+  warnings.warn(msg, category=UserWarning)</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="deprecated-items" class="level1">
+<h1>Deprecated Items</h1>
+<p>When any of the following classes and functions is called, it will raise an exception with an error message indicating how to handle the required code refactoring.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="pp">DeprecationWarning</span>                        Traceback (most recent call last)</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>Input In [<span class="dv">140</span>], <span class="kw">in</span> <span class="op">&lt;</span>cell line: <span class="dv">1</span><span class="op">&gt;</span>()</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="op">----&gt;</span> <span class="dv">1</span> TextFileBaseIterator(p2textfile)</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>Input In [<span class="dv">139</span>], <span class="kw">in</span> TextFileBaseIterator.<span class="fu">__init__</span>(<span class="va">self</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs)</span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>      <span class="dv">4</span> <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs):</span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>      <span class="dv">5</span>     msg <span class="op">=</span> \<span class="st">"</span><span class="ch">\"\"</span></span>
+<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a><span class="er">      6     `TextFileBaseIterator` is deprecated. </span></span>
+<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a>      <span class="dv">7</span>     Use `TextFileBaseReader` instead, <span class="cf">with</span> same capabilities <span class="kw">and</span> more.\<span class="st">"</span><span class="ch">\"\"</span></span>
+<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a><span class="er">----&gt; 8     raise DeprecationWarning</span>(msg)</span>
+<span id="cb74-11"><a href="#cb74-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-12"><a href="#cb74-12" aria-hidden="true" tabindex="-1"></a><span class="pp">DeprecationWarning</span>: </span>
+<span id="cb74-13"><a href="#cb74-13" aria-hidden="true" tabindex="-1"></a>        `TextFileBaseIterator` <span class="kw">is</span> deprecated. </span>
+<span id="cb74-14"><a href="#cb74-14" aria-hidden="true" tabindex="-1"></a>        Use `TextFileBaseReader` instead, <span class="cf">with</span> same capabilities <span class="kw">and</span> more.<span class="st">" </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/core.py#L534" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="textfilebaseiterator" class="level3">
+<h3 class="anchored" data-anchor-id="textfilebaseiterator">TextFileBaseIterator</h3>
+<blockquote class="blockquote">
+<pre><code> TextFileBaseIterator (*args, **kwargs)</code></pre>
+</blockquote>
+<p><em><a href="https://vtecftwy.github.io/metagentools/core.html#textfilebaseiterator"><code>TextFileBaseIterator</code></a> is a deprecated class, to be replaced by <a href="https://vtecftwy.github.io/metagentools/core.html#textfilebasereader"><code>TextFileBaseReader</code></a></em></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/vtecftwy\.github\.io\/metagentools");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/vtecftwy/metagentools/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

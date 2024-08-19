@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Tracking projects experiments with WandB">
+
+<title>wandb – metagentools</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="wandb – metagentools">
+<meta property="og:description" content="Tracking projects experiments with WandB">
+<meta property="og:site_name" content="metagentools">
+<meta name="twitter:title" content="wandb – metagentools">
+<meta name="twitter:description" content="Tracking projects experiments with WandB">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">metagentools</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">General Code</a></li><li class="breadcrumb-item"><a href="./wandb.html">wandb</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">metagentools</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">General Code</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">core</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wandb.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">wandb</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./art.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">art</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bio</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">CNN Virus</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cnn_virus_architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">architecture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cnn_virus_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cnn_virus_utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">utils</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#steps" id="toc-steps" class="nav-link active" data-scroll-target="#steps">Steps:</a>
+  <ul class="collapse">
+  <li><a href="#login_nb" id="toc-login_nb" class="nav-link" data-scroll-target="#login_nb">login_nb</a></li>
+  <li><a href="#wandbrun" id="toc-wandbrun" class="nav-link" data-scroll-target="#wandbrun">WandbRun</a></li>
+  <li><a href="#wandbrun.upload_dataset" id="toc-wandbrun.upload_dataset" class="nav-link" data-scroll-target="#wandbrun.upload_dataset">WandbRun.upload_dataset</a></li>
+  <li><a href="#close-a-wandb-run" id="toc-close-a-wandb-run" class="nav-link" data-scroll-target="#close-a-wandb-run">Close a WandB run</a></li>
+  <li><a href="#entity_projects" id="toc-entity_projects" class="nav-link" data-scroll-target="#entity_projects">entity_projects</a></li>
+  <li><a href="#get_project" id="toc-get_project" class="nav-link" data-scroll-target="#get_project">get_project</a></li>
+  <li><a href="#print_entity_project_list" id="toc-print_entity_project_list" class="nav-link" data-scroll-target="#print_entity_project_list">print_entity_project_list</a></li>
+  <li><a href="#project_artifacts" id="toc-project_artifacts" class="nav-link" data-scroll-target="#project_artifacts">project_artifacts</a></li>
+  <li><a href="#run_name_exists" id="toc-run_name_exists" class="nav-link" data-scroll-target="#run_name_exists">run_name_exists</a></li>
+  <li><a href="#unique_run_name" id="toc-unique_run_name" class="nav-link" data-scroll-target="#unique_run_name">unique_run_name</a></li>
+  </ul></li>
+  <li><a href="#technical-notes-for-development-with-nbdev" id="toc-technical-notes-for-development-with-nbdev" class="nav-link" data-scroll-target="#technical-notes-for-development-with-nbdev">Technical Notes for development with <code>nbdev</code></a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/vtecftwy/metagentools/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">General Code</a></li><li class="breadcrumb-item"><a href="./wandb.html">wandb</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">wandb</h1>
+</div>
+
+<div>
+  <div class="description">
+    Tracking projects experiments with <strong>WandB</strong>
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>Once setup, <strong>WandB</strong> tracks datasets, models, training runs, evaluation runs across several experiments. The original documentation is <a href="https://docs.wandb.ai/">here</a>.</p>
+<p>Key concepts we use in this package:</p>
+<ul>
+<li><code>Run</code> (status, losses and other metadata logged during training or evaluation experiments).</li>
+<li><code>Artifact</code> (datasets, code (incl.&nbsp;notebooks), models, …).
+<ul>
+<li>Artifacts can refer to a single file or to a directory with multiple files</li>
+</ul></li>
+</ul>
+<section id="steps" class="level2">
+<h2 class="anchored" data-anchor-id="steps">Steps:</h2>
+<ul>
+<li>Login to <strong><code>wandb</code></strong>:
+<ul>
+<li>May require an API key, which is available at <a href="https://wandb.ai/authorize">https://wandb.ai/authorize</a>. To access the API key, must be logged in onto WandB.</li>
+</ul></li>
+<li>Initialize a <strong><code>Run</code></strong> with desired parameters and metadata</li>
+<li>Perform operations to be tracked (e.g.&nbsp;train model, load dataset as artifact, …)</li>
+<li>Finish the <strong><code>Run</code></strong></li>
+</ul>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L20" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="login_nb" class="level3">
+<h3 class="anchored" data-anchor-id="login_nb">login_nb</h3>
+<blockquote class="blockquote">
+<pre><code> login_nb (nb_file:str|pathlib.Path=None)</code></pre>
+</blockquote>
+<p><em>First step to setup WandB from notebook. Logs in and logs passed notebook as source of code</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>nb_file</td>
+<td>str | pathlib.Path</td>
+<td>None</td>
+<td>name of the notebook (str) or path to the notebook (Path)</td>
+</tr>
+</tbody>
+</table>
+<p>To allow WandB to store the code used for the session, the <strong>name or path of the notebook must be passed</strong> as argument <code>nb_file</code>.</p>
+<p>Example:</p>
+<div id="cell-7" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>login_nb(<span class="st">'01_wandb'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Logging in from notebook: /home/vtec/projects/bio/metagentools/nbs-dev/01_wandb.ipynb</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>wandb: W&amp;B API key is configured. Use `wandb login --relogin` to force relogin</code></pre>
+</div>
+</div>
+<p><a href="https://vtecftwy.github.io/metagentools/wandb.html#login_nb"><code>login_nb</code></a> raises error in the following cases:</p>
+<ul>
+<li><p>If <code>nb_file</code> is not passed, the function raises a <code>TypeError</code></p></li>
+<li><p>If <code>nb_file</code> is not a string or a Path, the function raises a <code>TypeError</code></p></li>
+<li><p>There must exist a file <code>nb_file</code> or a <code>ValueError</code> is raised</p></li>
+</ul>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L44" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="wandbrun" class="level3">
+<h3 class="anchored" data-anchor-id="wandbrun">WandbRun</h3>
+<blockquote class="blockquote">
+<pre><code> WandbRun (entity:str='', project:str='', run_name:str='',
+           job_type:str='', notes:str='', logs_dir:str|pathlib.Path=None,
+           testing:bool=False)</code></pre>
+</blockquote>
+<p><em>Manages a WandB run and all logged actions performed while run is active. Close run with .finish()</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>entity</td>
+<td>str</td>
+<td></td>
+<td>user or organization under which the run will be logged. Default: <code>metagenomics_sh</code></td>
+</tr>
+<tr class="even">
+<td>project</td>
+<td>str</td>
+<td></td>
+<td>name of the WandB project under which the run will be logged</td>
+</tr>
+<tr class="odd">
+<td>run_name</td>
+<td>str</td>
+<td></td>
+<td>unique name for the run,</td>
+</tr>
+<tr class="even">
+<td>job_type</td>
+<td>str</td>
+<td></td>
+<td>e.g.: <code>load_datasets</code>, <code>train_exp</code>, …</td>
+</tr>
+<tr class="odd">
+<td>notes</td>
+<td>str</td>
+<td></td>
+<td>any text description or additional information to store with the run</td>
+</tr>
+<tr class="even">
+<td>logs_dir</td>
+<td>str | pathlib.Path</td>
+<td>None</td>
+<td>default is project_root/wandb-logs if None, or uses the passed Path</td>
+</tr>
+<tr class="odd">
+<td>testing</td>
+<td>bool</td>
+<td>False</td>
+<td>(optional) If True, will not create a run on WandB. Use for local testing</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Run</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<section id="create-a-run-instance" class="level4">
+<h4 class="anchored" data-anchor-id="create-a-run-instance">Create a Run instance</h4>
+<p>WandbRun allows to define a set of metadata associated with the run, such as <code>entity</code>, <code>project</code>, <code>name</code>, <code>job_type</code> and additional <code>notes</code>.</p>
+<p>Example:</p>
+<ul>
+<li>set the parameters</li>
+</ul>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>entity <span class="op">=</span> <span class="st">'metagenomics_sh'</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>project <span class="op">=</span> <span class="st">'reproduce_cnn_virus'</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>run_name <span class="op">=</span> <span class="st">'nbdev-test'</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>job_type <span class="op">=</span> <span class="st">"code_testing"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>notes <span class="op">=</span> <span class="st">'any other information of interest for the future'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>create a <a href="https://vtecftwy.github.io/metagentools/wandb.html#wandbrun"><code>WandbRun</code></a> instance called <code>wandb_run</code></li>
+</ul>
+<div id="cell-18" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>wandb_run <span class="op">=</span> WandbRun(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    entity<span class="op">=</span>entity, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    project<span class="op">=</span>project, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    run_name<span class="op">=</span>run_name, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    job_type<span class="op">=</span>job_type, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    notes<span class="op">=</span>notes</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"097525f281564afebc2b040bed6656d3","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+Tracking run with wandb version 0.13.9
+</div>
+<div class="cell-output cell-output-display">
+Run data is saved locally in <code>/home/vtec/projects/bio/metagentools/wandb-logs/wandb/run-20240809_145852-xjuxt5vv</code>
+</div>
+<div class="cell-output cell-output-display">
+Syncing run <strong><a href="https://wandb.ai/metagenomics_sh/reproduce_cnn_virus/runs/xjuxt5vv" target="_blank">nbdev-test</a></strong> to <a href="https://wandb.ai/metagenomics_sh/reproduce_cnn_virus" target="_blank">Weights &amp; Biases</a> (<a href="https://wandb.me/run" target="_blank">docs</a>)<br>
+</div>
+<div class="cell-output cell-output-display">
+ View project at <a href="https://wandb.ai/metagenomics_sh/reproduce_cnn_virus" target="_blank">https://wandb.ai/metagenomics_sh/reproduce_cnn_virus</a>
+</div>
+<div class="cell-output cell-output-display">
+ View run at <a href="https://wandb.ai/metagenomics_sh/reproduce_cnn_virus/runs/xjuxt5vv" target="_blank">https://wandb.ai/metagenomics_sh/reproduce_cnn_virus/runs/xjuxt5vv</a>
+</div>
+</div>
+<p><a href="https://vtecftwy.github.io/metagentools/wandb.html#wandbrun"><code>WandbRun</code></a> instantiation raises an error in the following cases:</p>
+<ul>
+<li><p>If one of <code>entity</code>, <code>project</code>, <code>run_name</code> or <code>job_type</code> is not passed, the function raises a <code>ValueError</code></p></li>
+<li><p>If one of <code>entity</code>, <code>project</code>, <code>run_name</code>, <code>job_type</code> or <code>notes</code> is not a string, the function raises a <code>TypeError</code></p></li>
+</ul>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L104" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="wandbrun.upload_dataset" class="level3">
+<h3 class="anchored" data-anchor-id="wandbrun.upload_dataset">WandbRun.upload_dataset</h3>
+<blockquote class="blockquote">
+<pre><code> WandbRun.upload_dataset (ds_path:str, ds_name:str, ds_type:str,
+                          ds_descr:str, ds_metadata:dict,
+                          load_type:str='file',
+                          wait_completion:bool=False)</code></pre>
+</blockquote>
+<p><em>Load a dataset from a file as WandB artifact, with associated information and metadata</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ds_path</td>
+<td>str</td>
+<td></td>
+<td>path to the file or directory to load as dataset artifact</td>
+</tr>
+<tr class="even">
+<td>ds_name</td>
+<td>str</td>
+<td></td>
+<td>name for the dataset</td>
+</tr>
+<tr class="odd">
+<td>ds_type</td>
+<td>str</td>
+<td></td>
+<td>type of dataset: e.g.&nbsp;raw_data, processed_data, …</td>
+</tr>
+<tr class="even">
+<td>ds_descr</td>
+<td>str</td>
+<td></td>
+<td>short description of the dataset</td>
+</tr>
+<tr class="odd">
+<td>ds_metadata</td>
+<td>dict</td>
+<td></td>
+<td>keys/values for metadata on the dataset, eg. nb_samples, …</td>
+</tr>
+<tr class="even">
+<td>load_type</td>
+<td>str</td>
+<td>file</td>
+<td><code>file</code> to load a single file, <code>dir</code> to load all files in a directory</td>
+</tr>
+<tr class="odd">
+<td>wait_completion</td>
+<td>bool</td>
+<td>False</td>
+<td>when True, wait completion of the logging before returning artifact</td>
+</tr>
+</tbody>
+</table>
+<section id="load-a-dataset-from-a-single-file" class="level4">
+<h4 class="anchored" data-anchor-id="load-a-dataset-from-a-single-file">Load a dataset from a single file</h4>
+<div id="cell-23" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ds_fname <span class="op">=</span> <span class="bu">str</span>(Path(<span class="st">'data_dev/cov_virus_sequence_one.fa'</span>).absolute())</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ds_name <span class="op">=</span> <span class="st">'cov_one_sequence'</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ds_type <span class="op">=</span> <span class="st">'cov_sequences'</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>ds_descr <span class="op">=</span> <span class="st">'one cov sequence fasta file'</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>ds_metadata <span class="op">=</span> {</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'nb_sequences'</span>: <span class="dv">1</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'file type'</span>: <span class="st">'fasta'</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>atx_one_file <span class="op">=</span> wandb_run.upload_dataset(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    ds_path<span class="op">=</span>ds_fname,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    ds_name<span class="op">=</span>ds_name,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    ds_type<span class="op">=</span>ds_type,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    ds_descr<span class="op">=</span>ds_descr,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    ds_metadata<span class="op">=</span>ds_metadata,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    load_type<span class="op">=</span><span class="st">'file'</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset cov_one_sequence is being logged as artifact ...</code></pre>
+</div>
+</div>
+</section>
+<section id="load-a-dataset-with-several-files-from-a-directory." class="level4">
+<h4 class="anchored" data-anchor-id="load-a-dataset-with-several-files-from-a-directory.">Load a dataset with several files from a directory.</h4>
+<div id="cell-26" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ds_dirname <span class="op">=</span> <span class="bu">str</span>(Path(<span class="st">'data_dev/single_1seq_150bp'</span>).absolute())</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ds_name <span class="op">=</span> <span class="st">'cov_reads_single_1_sequence_150bp'</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>ds_type <span class="op">=</span> <span class="st">'sim_reads'</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>ds_descr <span class="op">=</span> <span class="st">'Simulated single reads of one cov sequence'</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>ds_metadata <span class="op">=</span> {</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'nb_sequences'</span>: <span class="dv">1</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'sim_type'</span>: <span class="st">'single'</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'read_length'</span>: <span class="dv">150</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'fold'</span>: <span class="dv">100</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-27" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>atx_multi_files <span class="op">=</span> wandb_run.upload_dataset(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    ds_path<span class="op">=</span>ds_dirname,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    ds_name<span class="op">=</span>ds_name,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    ds_type<span class="op">=</span>ds_type,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    ds_descr<span class="op">=</span>ds_descr,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    ds_metadata<span class="op">=</span>ds_metadata,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    load_type<span class="op">=</span><span class="st">'dir'</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>wandb: Adding directory to artifact (/home/vtec/projects/bio/metagentools/nbs-dev/data_dev/single_1seq_150bp)... Done. 0.0s</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset cov_reads_single_1_sequence_150bp is being logged as artifact ...</code></pre>
+</div>
+</div>
+<p><a href="https://vtecftwy.github.io/metagentools/wandb.html#wandbrun.upload_dataset"><code>WandbRun.upload_dataset</code></a> raises an error in the following cases:</p>
+<ul>
+<li><p><code>ds_path</code> is a file and <code>load_type</code> is <code>dir</code></p></li>
+<li><p><code>ds_path</code> is a directory and <code>load_type</code> is ’file`</p></li>
+<li><p><code>load_type</code> has another value then <code>file</code> or <code>dir</code></p></li>
+</ul>
+</section>
+</section>
+<section id="close-a-wandb-run" class="level3">
+<h3 class="anchored" data-anchor-id="close-a-wandb-run">Close a WandB run</h3>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>wandb_run.finish()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+Waiting for W&amp;B process to finish... <strong style="color:green">(success).</strong>
+</div>
+<div class="cell-output cell-output-display">
+ View run <strong style="color:#cdcd00">nbdev-test</strong> at: <a href="https://wandb.ai/metagenomics_sh/reproduce_cnn_virus/runs/xjuxt5vv" target="_blank">https://wandb.ai/metagenomics_sh/reproduce_cnn_virus/runs/xjuxt5vv</a><br>Synced 7 W&amp;B file(s), 0 media file(s), 6 artifact file(s) and 1 other file(s)
+</div>
+<div class="cell-output cell-output-display">
+Find logs at: <code>/home/vtec/projects/bio/metagentools/wandb-logs/wandb/run-20240809_145852-xjuxt5vv/logs</code>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L143" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="entity_projects" class="level3">
+<h3 class="anchored" data-anchor-id="entity_projects">entity_projects</h3>
+<blockquote class="blockquote">
+<pre><code> entity_projects (entity:str)</code></pre>
+</blockquote>
+<p><em>Returns all projects under ‘entity’, as an iterable collection</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>entity</td>
+<td>str</td>
+<td>name of the entity from which the projects will be retrieved</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Projects</strong></td>
+<td><strong>Projects iterator</strong></td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://vtecftwy.github.io/metagentools/wandb.html#entity_projects"><code>entity_projects</code></a> inquires WandB to retrieve all the projects, and returns them as an iterable object.</p>
+<p>Each element in the iterator is a <code>wandb.Project</code> object. Each <a href="https://docs.wandb.ai/ref/python/public-api/project"><code>Project</code></a> object has the following attributes:</p>
+<ul>
+<li><code>_attrs</code>: dict of attributes associated with the project (<code>id</code>, <code>name</code>, <code>entityName</code>, <code>createdAt</code>). These attributes can be called directly as <code>object.id</code>, …</li>
+<li><code>entity</code></li>
+<li><code>name</code>: project name</li>
+<li><code>path</code>: as a list [entity, name]</li>
+<li><code>url</code>: the url to the project workspace (‘https://wandb.ai/entity/project/workspace’)</li>
+</ul>
+<div id="cell-36" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>projs <span class="op">=</span> entity_projects(entity<span class="op">=</span><span class="st">'vtecftyw'</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> projs:</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>p<span class="sc">.</span>name<span class="sc">}</span><span class="ss">:"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'  name:   '</span>, p.name)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'  entity  '</span>, p.entity)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'  path:   '</span>, p.path)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'  url:    '</span>, p.url)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'  id:     '</span>, p.<span class="bu">id</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'  created:'</span>, p.createdAt)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'  _attrs: '</span>, p._attrs)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>huggingface:
+  name:    huggingface
+  entity   vtecftyw
+  path:    ['vtecftyw', 'huggingface']
+
+  url:     https://wandb.ai/vtecftyw/huggingface/workspace
+  id:      UHJvamVjdDp2MTpodWdnaW5nZmFjZTp2dGVjZnR5dw==
+  created: 2023-06-21T07:34:22
+  _attrs:  {'id': 'UHJvamVjdDp2MTpodWdnaW5nZmFjZTp2dGVjZnR5dw==', 'name': 'huggingface', 'entityName': 'vtecftyw', 'createdAt': '2023-06-21T07:34:22', 'isBenchmark': False}
+
+tut_artifacts:
+  name:    tut_artifacts
+  entity   vtecftyw
+  path:    ['vtecftyw', 'tut_artifacts']
+
+  url:     https://wandb.ai/vtecftyw/tut_artifacts/workspace
+  id:      UHJvamVjdDp2MTp0dXRfYXJ0aWZhY3RzOnZ0ZWNmdHl3
+  created: 2022-09-30T04:39:35
+  _attrs:  {'id': 'UHJvamVjdDp2MTp0dXRfYXJ0aWZhY3RzOnZ0ZWNmdHl3', 'name': 'tut_artifacts', 'entityName': 'vtecftyw', 'createdAt': '2022-09-30T04:39:35', 'isBenchmark': False}
+
+metagenomics:
+  name:    metagenomics
+  entity   vtecftyw
+  path:    ['vtecftyw', 'metagenomics']
+
+  url:     https://wandb.ai/vtecftyw/metagenomics/workspace
+  id:      UHJvamVjdDp2MTptZXRhZ2Vub21pY3M6dnRlY2Z0eXc=
+  created: 2022-09-09T10:39:00
+  _attrs:  {'id': 'UHJvamVjdDp2MTptZXRhZ2Vub21pY3M6dnRlY2Z0eXc=', 'name': 'metagenomics', 'entityName': 'vtecftyw', 'createdAt': '2022-09-09T10:39:00', 'isBenchmark': False}
+
+wand-hello-world-fastai:
+  name:    wand-hello-world-fastai
+  entity   vtecftyw
+  path:    ['vtecftyw', 'wand-hello-world-fastai']
+
+  url:     https://wandb.ai/vtecftyw/wand-hello-world-fastai/workspace
+  id:      UHJvamVjdDp2MTp3YW5kLWhlbGxvLXdvcmxkLWZhc3RhaTp2dGVjZnR5dw==
+  created: 2022-06-14T15:45:17
+  _attrs:  {'id': 'UHJvamVjdDp2MTp3YW5kLWhlbGxvLXdvcmxkLWZhc3RhaTp2dGVjZnR5dw==', 'name': 'wand-hello-world-fastai', 'entityName': 'vtecftyw', 'createdAt': '2022-06-14T15:45:17', 'isBenchmark': False}
+</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L152" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_project" class="level3">
+<h3 class="anchored" data-anchor-id="get_project">get_project</h3>
+<blockquote class="blockquote">
+<pre><code> get_project (entity:str, project_name:str)</code></pre>
+</blockquote>
+<p><em>Returns project object defined by entity and project name</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>entity</td>
+<td>str</td>
+<td>name of the entity from which the project will be retrieved</td>
+</tr>
+<tr class="even">
+<td>project_name</td>
+<td>str</td>
+<td>name of the project to retrieve</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>Project</strong></td>
+<td><strong>Project object</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="cell-38" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> get_project(<span class="st">'vtecftyw'</span>, <span class="st">'tut_artifacts'</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">type</span>(p))</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(p.entity,<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>, p.name,<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>, p.path,<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>, p.url)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'wandb.apis.public.Project'&gt;
+vtecftyw 
+ tut_artifacts 
+ ['vtecftyw', 'tut_artifacts'] 
+ https://wandb.ai/vtecftyw/tut_artifacts/workspace</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L161" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="print_entity_project_list" class="level3">
+<h3 class="anchored" data-anchor-id="print_entity_project_list">print_entity_project_list</h3>
+<blockquote class="blockquote">
+<pre><code> print_entity_project_list (entity)</code></pre>
+</blockquote>
+<p><em>Print the name and url of all projects in entity</em></p>
+<div id="cell-40" class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>print_entity_project_list(<span class="st">'vtecftyw'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>List of projects under entity &lt;vtecftyw&gt;
+  0. huggingface                    (url: https://wandb.ai/vtecftyw/huggingface/workspace)
+  1. tut_artifacts                  (url: https://wandb.ai/vtecftyw/tut_artifacts/workspace)
+  2. metagenomics                   (url: https://wandb.ai/vtecftyw/metagenomics/workspace)
+  3. wand-hello-world-fastai        (url: https://wandb.ai/vtecftyw/wand-hello-world-fastai/workspace)</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L169" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="project_artifacts" class="level3">
+<h3 class="anchored" data-anchor-id="project_artifacts">project_artifacts</h3>
+<blockquote class="blockquote">
+<pre><code> project_artifacts (entity:str, project_name:str, by_alias:str='latest',
+                    by_type:str=None, by_version:str=None)</code></pre>
+</blockquote>
+<p><em>Returns all artifacts in project, w/ key info, filtered by alias, types and version + list of artifact types</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>entity</td>
+<td>str</td>
+<td></td>
+<td>name of the entity from which to retrieve the artifacts</td>
+</tr>
+<tr class="even">
+<td>project_name</td>
+<td>str</td>
+<td></td>
+<td>name of the project from which to retrieve the artifacts</td>
+</tr>
+<tr class="odd">
+<td>by_alias</td>
+<td>str</td>
+<td>latest</td>
+<td>name of the alias to filter by</td>
+</tr>
+<tr class="even">
+<td>by_type</td>
+<td>str</td>
+<td>None</td>
+<td>name of the artifact type to filter by (optional)</td>
+</tr>
+<tr class="odd">
+<td>by_version</td>
+<td>str</td>
+<td>None</td>
+<td>version to filter by (optional)</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Tuple</strong></td>
+<td></td>
+<td><strong>df w/ all artifacts and related info; list of artifact types in the project</strong></td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://vtecftwy.github.io/metagentools/wandb.html#project_artifacts"><code>project_artifacts</code></a> returns:</p>
+<ul>
+<li>a DataFrame including all the artifacts available under the project (<code>entity/project_name</code>)</li>
+<li>a list of all artifact types in the projects</li>
+</ul>
+<div id="cell-43" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>atx_df, atx_type_list <span class="op">=</span> project_artifacts(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    entity<span class="op">=</span><span class="st">'metagenomics_sh'</span>, </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    project_name<span class="op">=</span><span class="st">'reproduce_cnn_virus'</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>atx_type_list</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['raw_data', 'code', 'model', 'wandb-history', 'sim_reads', 'cov_sequences']</code></pre>
+</div>
+</div>
+<div id="cell-44" class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>atx_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">atx_name</th>
+<th data-quarto-table-cell-role="th">atx_version</th>
+<th data-quarto-table-cell-role="th">atx_type</th>
+<th data-quarto-table-cell-role="th">atx_aliases</th>
+<th data-quarto-table-cell-role="th">file_count</th>
+<th data-quarto-table-cell-role="th">created</th>
+<th data-quarto-table-cell-role="th">updated</th>
+<th data-quarto-table-cell-role="th">atx_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>origin_validation_20k:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:14:44</td>
+<td>2022-09-20T07:30:20</td>
+<td>QXJ0aWZhY3Q6MTk2NjM3ODEx</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>origin_validation_200k:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:14:46</td>
+<td>2022-09-20T07:30:20</td>
+<td>QXJ0aWZhY3Q6MTk2NjM3ODMx</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>origin_validation_1M:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:14:48</td>
+<td>2022-09-20T07:30:20</td>
+<td>QXJ0aWZhY3Q6MTk2NjM3ODUz</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>origin_training_100k:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:15:10</td>
+<td>2022-09-19T16:15:12</td>
+<td>QXJ0aWZhY3Q6MTk2NjM4MDc5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>origin_training_1M:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:15:12</td>
+<td>2022-09-19T16:15:14</td>
+<td>QXJ0aWZhY3Q6MTk2NjM4MDkx</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>origin_training_15M:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:15:20</td>
+<td>2022-09-19T16:15:33</td>
+<td>QXJ0aWZhY3Q6MTk2NjM4MTY0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>origin_training_30M:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:15:38</td>
+<td>2022-09-19T16:16:06</td>
+<td>QXJ0aWZhY3Q6MTk2NjM4Mjk2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>origin_training_50M:v0</td>
+<td>v0</td>
+<td>raw_data</td>
+<td>latest</td>
+<td>1</td>
+<td>2022-09-19T16:16:10</td>
+<td>2022-09-20T07:30:18</td>
+<td>QXJ0aWZhY3Q6MTk2NjM4NjEw</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>model-train_1M-221002-1625:v3</td>
+<td>v3</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-02T16:52:58</td>
+<td>2022-10-02T16:53:02</td>
+<td>QXJ0aWZhY3Q6MjExMjY1NzEw</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>model-train_15M-221003-0251:v5</td>
+<td>v5</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-03T11:25:30</td>
+<td>2022-10-03T11:25:34</td>
+<td>QXJ0aWZhY3Q6MjExODYzNDY5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>model-retrain_15M-221004-1003:v4</td>
+<td>v4</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-04T17:07:46</td>
+<td>2022-10-04T17:07:51</td>
+<td>QXJ0aWZhY3Q6MjEyNzA1MDc1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>model-retrain_15M-221005-0600:v4</td>
+<td>v4</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-05T12:58:34</td>
+<td>2022-10-05T12:58:39</td>
+<td>QXJ0aWZhY3Q6MjEzNzU2MTY2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>run-r6qj2dy2-history:v0</td>
+<td>v0</td>
+<td>wandb-history</td>
+<td>latest</td>
+<td>1</td>
+<td>2023-01-17T05:59:04</td>
+<td>2023-01-17T05:59:04</td>
+<td>QXJ0aWZhY3Q6MzI5MDAwNzAx</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>run-3llf3b5y-history:v0</td>
+<td>v0</td>
+<td>wandb-history</td>
+<td>latest</td>
+<td>1</td>
+<td>2023-01-17T05:59:04</td>
+<td>2023-01-17T05:59:04</td>
+<td>QXJ0aWZhY3Q6MzI5MDAwNzAw</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>run-12okrxy6-history:v0</td>
+<td>v0</td>
+<td>wandb-history</td>
+<td>latest</td>
+<td>1</td>
+<td>2023-01-17T05:59:04</td>
+<td>2023-01-17T05:59:04</td>
+<td>QXJ0aWZhY3Q6MzI5MDAwNzAy</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>run-kwvtsumh-history:v0</td>
+<td>v0</td>
+<td>wandb-history</td>
+<td>latest</td>
+<td>1</td>
+<td>2024-07-14T15:53:12</td>
+<td>2024-07-14T15:53:12</td>
+<td>QXJ0aWZhY3Q6OTcyNTc2ODY3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>cov_one_sequence:v0</td>
+<td>v0</td>
+<td>cov_sequences</td>
+<td>latest</td>
+<td>1</td>
+<td>2024-08-09T07:01:23</td>
+<td>2024-08-09T07:01:56</td>
+<td>QXJ0aWZhY3Q6MTEyMzY3NjU5Mg==</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>cov_reads_single_1_sequence_150bp:v0</td>
+<td>v0</td>
+<td>sim_reads</td>
+<td>latest</td>
+<td>2</td>
+<td>2024-08-09T07:02:27</td>
+<td>2024-08-09T07:03:04</td>
+<td>QXJ0aWZhY3Q6MTEyMzY4MTU0Mg==</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>source-reproduce_cnn_virus-None:v151</td>
+<td>v151</td>
+<td>code</td>
+<td>latest</td>
+<td>2</td>
+<td>2024-08-09T07:03:48</td>
+<td>2024-08-09T07:04:15</td>
+<td>QXJ0aWZhY3Q6MTEyMzY4NzgyMw==</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The list of artifacts can be filtered, for instance, by artifact type</p>
+<div id="cell-46" class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>atx_df, atx_type_list <span class="op">=</span> project_artifacts(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    entity<span class="op">=</span><span class="st">'metagenomics_sh'</span>, </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    project_name<span class="op">=</span><span class="st">'reproduce_cnn_virus'</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    by_type<span class="op">=</span><span class="st">'model'</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>atx_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">atx_name</th>
+<th data-quarto-table-cell-role="th">atx_version</th>
+<th data-quarto-table-cell-role="th">atx_type</th>
+<th data-quarto-table-cell-role="th">atx_aliases</th>
+<th data-quarto-table-cell-role="th">file_count</th>
+<th data-quarto-table-cell-role="th">created</th>
+<th data-quarto-table-cell-role="th">updated</th>
+<th data-quarto-table-cell-role="th">atx_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>model-train_1M-221002-1625:v3</td>
+<td>v3</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-02T16:52:58</td>
+<td>2022-10-02T16:53:02</td>
+<td>QXJ0aWZhY3Q6MjExMjY1NzEw</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>model-train_15M-221003-0251:v5</td>
+<td>v5</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-03T11:25:30</td>
+<td>2022-10-03T11:25:34</td>
+<td>QXJ0aWZhY3Q6MjExODYzNDY5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>model-retrain_15M-221004-1003:v4</td>
+<td>v4</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-04T17:07:46</td>
+<td>2022-10-04T17:07:51</td>
+<td>QXJ0aWZhY3Q6MjEyNzA1MDc1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>model-retrain_15M-221005-0600:v4</td>
+<td>v4</td>
+<td>model</td>
+<td>latest</td>
+<td>4</td>
+<td>2022-10-05T12:58:34</td>
+<td>2022-10-05T12:58:39</td>
+<td>QXJ0aWZhY3Q6MjEzNzU2MTY2</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L213" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="run_name_exists" class="level3">
+<h3 class="anchored" data-anchor-id="run_name_exists">run_name_exists</h3>
+<blockquote class="blockquote">
+<pre><code> run_name_exists (run_name:str, entity:str, project_name:str)</code></pre>
+</blockquote>
+<p><em>Check whether a run with name <code>run_name</code> already exists in <code>entity/project_name</code></em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>run_name</td>
+<td>str</td>
+<td>name of the run to check</td>
+</tr>
+<tr class="even">
+<td>entity</td>
+<td>str</td>
+<td>name of the entity from which to retrieve the artifacts</td>
+</tr>
+<tr class="odd">
+<td>project_name</td>
+<td>str</td>
+<td>name of the project from which to retrieve the artifacts</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>bool</strong></td>
+<td><strong>True if a run exists with the name run_name, False otherwise</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="cell-48" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>run_name_exists(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    run_name<span class="op">=</span><span class="st">'train_1M-221002-1625'</span>, </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    entity<span class="op">=</span><span class="st">'metagenomics_sh'</span>, </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    project_name<span class="op">=</span><span class="st">'reproduce_cnn_virus'</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>True</code></pre>
+</div>
+</div>
+<div id="cell-49" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>run_name_exists(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    run_name<span class="op">=</span><span class="st">'train_1M'</span>, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    entity<span class="op">=</span><span class="st">'metagenomics_sh'</span>, </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    project_name<span class="op">=</span><span class="st">'reproduce_cnn_virus'</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>False</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/vtecftwy/metagentools/blob/main/metagentools/wandb.py#L225" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="unique_run_name" class="level3">
+<h3 class="anchored" data-anchor-id="unique_run_name">unique_run_name</h3>
+<blockquote class="blockquote">
+<pre><code> unique_run_name (name_seed:str)</code></pre>
+</blockquote>
+<p><em>Create a unique run name by adding a timestamp to the passed seed</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>name_seed</td>
+<td>str</td>
+<td>Run name to which a timestamp will be added</td>
+</tr>
+</tbody>
+</table>
+<div id="cell-51" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>unique_run_name(<span class="st">'this_is_a_run_name'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'this_is_a_run_name-240810-1522'</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="technical-notes-for-development-with-nbdev" class="level2">
+<h2 class="anchored" data-anchor-id="technical-notes-for-development-with-nbdev">Technical Notes for development with <code>nbdev</code></h2>
+<p><strong>Resolve problem with <code>nbdev_export()</code> for this notebook</strong></p>
+<p>When using <code>nbdev.nbdev_export()</code> in this notebook, the code exported seems to be old code. In particular, the dependency import section in cell is exported as:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %% ../nbs-dev/wandb/run-20221123_121523-2z5ycjrb/tmp/code/01_wandb.ipynb 2</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Imports all dependencies</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> configparser</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> psutil</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The hint is in the first line:</p>
+<p><strong><code># %% ../nbs-dev/wandb/run-20221123_121523-2z5ycjrb/tmp/code/01_wandb.ipynb 2</code></strong></p>
+<p>It shows that the notebook used for exporting is not <strong><code>/nbs-dev/01_wandb.ipynb</code></strong> as it should be. This is because the WandB package creates a local directory <code>/nbs-dev/wandb/</code> where it keeps local logs and artifacts.</p>
+<p>The solution is to move the directory where WandB stores local logs outside <code>nbs-dev</code>, which can be done with the <code>dir</code> argument in <code>wandb.Run()</code></p>
+<p>Illustrating by reproducing the functions from nbdev and a few dependencies</p>
+<div id="cell-57" class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nbdev.config <span class="im">import</span> get_config</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastcore.xtras <span class="im">import</span> globtastic</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastcore.meta <span class="im">import</span> delegates</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-58" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from nbdev.doclinks.py</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># line 105</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="at">@delegates</span>(globtastic)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nbglob(path<span class="op">=</span><span class="va">None</span>, skip_folder_re <span class="op">=</span> <span class="st">'^[_.]'</span>, file_glob<span class="op">=</span><span class="st">'*.ipynb'</span>, skip_file_re<span class="op">=</span><span class="st">'^[_.]'</span>, key<span class="op">=</span><span class="st">'nbs_path'</span>, as_path<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>kwargs):</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Find all files in a directory matching an extension given a config key."</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> Path(path <span class="kw">or</span> get_config()[key])</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    recursive<span class="op">=</span>get_config().recursive</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> globtastic(path, file_glob<span class="op">=</span>file_glob, skip_folder_re<span class="op">=</span>skip_folder_re,</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>                     skip_file_re<span class="op">=</span>skip_file_re, recursive<span class="op">=</span>recursive, <span class="op">**</span>kwargs)</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res.<span class="bu">map</span>(Path) <span class="cf">if</span> as_path <span class="cf">else</span> res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-59" class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># line 131 MODIFIED</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> modified_nbdev_export(</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Path or filename</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs):</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Export notebooks in `path` to Python modules"</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.environ.get(<span class="st">'IN_TEST'</span>,<span class="dv">0</span>): <span class="cf">return</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    files <span class="op">=</span> nbglob(path<span class="op">=</span>path, as_path<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs).<span class="bu">sorted</span>(<span class="st">'name'</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     for f in files: nb_export(f)</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> files: <span class="bu">print</span>(f)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="co">#     add_init(get_config().lib_path)</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="co">#     _build_modidx()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Before the change:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>modified_nbdev_export()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="ascii"><code>/home/vtec/projects/bio/metagentools/nbs-dev/00_core.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/01_wandb.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/wandb/run-20221122_182641-1eafsab9/tmp/code/01_wandb.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/wandb/run-20221122_180513-1vgzoryt/tmp/code/01_wandb.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/wandb/run-20221123_121523-2z5ycjrb/tmp/code/01_wandb.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/index.ipynb</code></pre>
+<p>After the change</p>
+<div id="cell-62" class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>modified_nbdev_export()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>/home/vtec/projects/bio/metagentools/nbs-dev/00_core.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/01_wandb.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/02_art.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/03_bio.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/03_cnn_virus_architecture.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/03_cnn_virus_data.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/03_cnn_virus_utils.ipynb
+/home/vtec/projects/bio/metagentools/nbs-dev/index.ipynb</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"26b205197a934fdeabb71e65ac11acba":{"model_module":"@jupyter-widgets/base","model_module_version":"1.2.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"514ad0bfcabf4df580a9a872af814af9":{"model_module":"@jupyter-widgets/controls","model_module_version":"1.5.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"55646397fc9349d3af9e98b1f2b26f5d":{"model_module":"@jupyter-widgets/base","model_module_version":"1.2.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"70f6be4247664b708b662c34e7abe3ee":{"model_module":"@jupyter-widgets/base","model_module_version":"1.2.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"7179c6cc207941648c348b1bf10cb87f":{"model_module":"@jupyter-widgets/controls","model_module_version":"1.5.0","model_name":"LabelModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"LabelModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"LabelView","description":"","description_tooltip":null,"layout":"IPY_MODEL_70f6be4247664b708b662c34e7abe3ee","placeholder":"​","style":"IPY_MODEL_bdde467d943148ce9bb6355fd7582a5c","value":"0.078 MB of 0.078 MB uploaded (0.020 MB deduped)\r"}},"7849f255e99b4853bdba7f8badf1054a":{"model_module":"@jupyter-widgets/controls","model_module_version":"1.5.0","model_name":"VBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"VBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"VBoxView","box_style":"","children":["IPY_MODEL_7179c6cc207941648c348b1bf10cb87f","IPY_MODEL_e0819a1ddcc64c08a748a2fd88350f09"],"layout":"IPY_MODEL_26b205197a934fdeabb71e65ac11acba"}},"bdde467d943148ce9bb6355fd7582a5c":{"model_module":"@jupyter-widgets/controls","model_module_version":"1.5.0","model_name":"DescriptionStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"e0819a1ddcc64c08a748a2fd88350f09":{"model_module":"@jupyter-widgets/controls","model_module_version":"1.5.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"","description":"","description_tooltip":null,"layout":"IPY_MODEL_55646397fc9349d3af9e98b1f2b26f5d","max":1,"min":0,"orientation":"horizontal","style":"IPY_MODEL_514ad0bfcabf4df580a9a872af814af9","value":1}},"state":{},"version_major":2,"version_minor":0}
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/vtecftwy\.github\.io\/metagentools");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/vtecftwy/metagentools/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
