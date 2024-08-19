@@ -46,15 +46,20 @@ class ProjectFileSystem:
         # Create instance if it does not exist yet
         if cls._instance is None:
             cls.home = Path.home().resolve()
-            cls.p2config = cls.home / cls._config_dir / cls._config_fname
+            if kwargs.get('config_fname', None) is not None:
+                cls.p2config = kwargs['config_fname']
+            else:
+                cls.p2config = cls.home / cls._config_dir / cls._config_fname
             cls._instance = super().__new__(cls)
         return cls._instance
     
     def __init__(
         self, 
         mount_gdrive:bool=True,  # True to mount Google Drive if running on Colab
-        project_file:Path=None   # Path to the project file. If None, use the one saved in the config file
+        project_file:Path=None,  # Path to the project file. If None, use the one saved in the config file
+        config_fname:Path=None,   # Path to a configuration file. If None, use the default one in the user's home directory
         ):
+            # Discover where the script is being run
             self.is_colab = 'google.colab' in sys.modules       
             if self.is_colab and mount_gdrive:
                 drive.mount('/content/gdrive')
@@ -72,11 +77,12 @@ class ProjectFileSystem:
                       before you can use the ProjectFileSystem class.
                       """
                 warnings.warn(msg, UserWarning)
-
+            # Set key directory paths
             self._project_root = Path()
             if self.is_local:
                 cfg = self.read_config()
                 path_str = cfg.get('Infra', 'project_root', fallback=None)
+                data_dir = cfg.get('Infra', 'data_dir', fallback='data')
                 if path_str is None: 
                     msg = """
                     Project root is not yet set in config file.
@@ -85,7 +91,7 @@ class ProjectFileSystem:
                     warnings.warn(msg)
                 else:
                     self._project_root = Path(path_str)
-            self._data = self.project_root / 'data'
+            self._data = self.project_root / str(data_dir)
             self._nbs = self.project_root / 'nbs'
 
     def __call__(self): return self.is_local
@@ -117,7 +123,8 @@ class ProjectFileSystem:
 
     def set_project_root(
         self, 
-        p2project: str|Path   # string or Path to the project directory. Can be absolute or relative to home
+        p2project: str|Path,      # string or Path to the project directory. Can be absolute or relative to home
+        data_dir: str = 'data'    # Directory name for data under project root
         ):
         """Update the configuration file to set the project root"""
         # Build and validate the path to the project root
@@ -131,10 +138,13 @@ class ProjectFileSystem:
         cfg = self.read_config()
         os.makedirs(self.home/self._config_dir, exist_ok=True)
         cfg['Infra']['project_root'] = str(p2project.absolute())
+        cfg['Infra']['data_dir'] = str(data_dir)
         with open(self.p2config, 'w') as fp:
             cfg.write(fp)
         self._project_root = p2project
-        print(f"Project Root set to {p2project.absolute()}")
+        self._data = self.project_root / data_dir
+        print(f"Project Root set to:   {self._project_root.absolute()}")
+        print(f"Data directory set to: {self._data.absolute()}")
         return cfg
 
     @property
@@ -164,7 +174,9 @@ class ProjectFileSystem:
     def nbs(self,folder_name): return self.project_root / folder_name
 
     @property
-    def p2config(self): return self.home / self._config_dir / self._config_fname
+    def p2config(self): 
+
+        return self.home / self._config_dir / self._config_fname
         
     @property
     def is_local(self):
@@ -216,7 +228,7 @@ class ProjectFileSystem:
             print('No markdown file in this folder')
         
 
-# %% ../nbs-dev/00_core.ipynb 33
+# %% ../nbs-dev/00_core.ipynb 36
 class JsonDict(dict):
     """Dictionary whose current value is mirrored in a json file and can be initated from a json file
     
@@ -269,7 +281,7 @@ class JsonDict(dict):
 
 
 
-# %% ../nbs-dev/00_core.ipynb 44
+# %% ../nbs-dev/00_core.ipynb 47
 class JsonFileReader:
     """Mirror a JSON file and a dictionary"""
     def __init__(self, 
@@ -295,7 +307,7 @@ class JsonFileReader:
         with open(path, 'w') as fp:
             json.dump(self.d, fp, indent=4)
 
-# %% ../nbs-dev/00_core.ipynb 56
+# %% ../nbs-dev/00_core.ipynb 59
 class TextFileBaseReader:
     """Iterator going through a text file by chunks of `nlines` lines. Iterator can be reset to file start.
     
@@ -515,7 +527,7 @@ class TextFileBaseReader:
             self.reset_iterator()
 
 
-# %% ../nbs-dev/00_core.ipynb 77
+# %% ../nbs-dev/00_core.ipynb 80
 class TextFileBaseIterator:
     """`TextFileBaseIterator` is a deprecated class, to be replaced by `TextFileBaseReader`"""
     def __init__(self, *args, **kwargs):

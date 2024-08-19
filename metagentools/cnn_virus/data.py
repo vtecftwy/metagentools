@@ -37,7 +37,7 @@ from .. import __file__
 CODE_ROOT = Path(__file__).parents[0]
 PACKAGE_ROOT = Path(__file__).parents[1]
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 17
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 19
 class OriginalLabels:
     """Converts labels to species name for original data"""
     def __init__(self, p2mapping=None):
@@ -56,7 +56,7 @@ class OriginalLabels:
     def species2label(self, s:str):
         return self._species2label[s]
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 36
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 35
 class FastaFileReader(TextFileBaseReader):
     """Wrap a FASTA file and retrieve its content in raw format and parsed format"""
     def __init__(
@@ -118,7 +118,7 @@ class FastaFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 87
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 81
 class FastqFileReader(TextFileBaseReader):
     """Iterator going through a fastq file's sequences and return each section + prob error as a dict"""
     def __init__(
@@ -188,7 +188,7 @@ class FastqFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 103
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 96
 class AlnFileReader(TextFileBaseReader):
     """Iterator going through an ALN file"""
     def __init__(
@@ -385,7 +385,7 @@ class AlnFileReader(TextFileBaseReader):
             # We used the iterator, now we need to reset it to make all lines available
             self.reset_iterator()
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 140
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 133
 def create_infer_ds_from_fastq(
     p2fastq: str|Path,             # Path to the fastq file (aln file path is inferred)
     output_dir:str|Path|None=None, # Path to directory where ds file will be saved
@@ -453,7 +453,7 @@ def create_infer_ds_from_fastq(
     
     return p2dataset, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 147
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 139
 def strings_to_tensors(
     b: tf.Tensor        # batch of strings 
     ):
@@ -511,7 +511,7 @@ def strings_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 150
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 142
 def _bytes_feature(value):
     """Returns a bytes_list from a string / byte."""
     if isinstance(value, type(tf.constant(0))): # if value is tensor
@@ -530,7 +530,7 @@ def _serialize_array(array):
   array = serialize_tensor(array)
   return array
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 151
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 143
 def _base_hot_encode(
     line: str        # one string (one line in text dataset)
     ):
@@ -579,7 +579,7 @@ def _base_hot_encode(
 
     return x_reads, y_labels, y_pos
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 152
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 144
 def split_kmer_into_50mers(
     kmer: tf.Tensor        # tensor representing a single k-mer read, after base
     ):
@@ -597,7 +597,7 @@ def split_kmer_into_50mers(
     shifted = tf.scan(fn, shifts, kmer, reverse=False)
     return shifted[:, :n, :]  # return the tensor with shifted kmer, sliced to only keep 50 bases
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 153
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 145
 def base_string_kmers_to_tensors(
     b: tf.Tensor,   # batch of strings 
     k: int = 50     # maximum read length in the batch
@@ -657,7 +657,7 @@ def base_string_kmers_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 154
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 146
 def split_kmer_batch_into_50mers(
     kmer: tf.Tensor        # tensor representing a batch of k-mer reads, after base encoding
     ):
@@ -687,7 +687,7 @@ def split_kmer_batch_into_50mers(
     # return shifted[:, :50, :]  # return the tensor with shifted kmer, sliced to only keep 50 bases
     return shifted  # return the tensor with shifted kmer, sliced to only keep 50 bases
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 155
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 147
 def tfrecord_from_fastq(
     p2fastq:Path,              # Path to the fastaq file (should be associated with a aln file)
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in saved directory
@@ -753,7 +753,7 @@ def tfrecord_from_fastq(
     
     return p2tfrds, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 156
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 148
 def tfrecord_from_text(
     p2ds,                      # Path to the text dataset, in the format of original CNN Virus data
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
@@ -789,7 +789,7 @@ def tfrecord_from_text(
     print(f"Wrote {i+1} reads to TFRecord")
     return p2tfrds
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 157
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 149
 def _parse_tfr_element(element):
     # Define the underlying structure of the data (mirror the dta structure above)
     data = {    
@@ -811,7 +811,7 @@ def _parse_tfr_element(element):
     
     return (read, (label, pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 158
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 150
 def get_dataset_from_tfr(
     p2tfrds:Path,      # Path to the TFRecord dataset
     batch_size:int = 1 # Desired batch side for the dataset
@@ -822,7 +822,7 @@ def get_dataset_from_tfr(
     dataset = dataset.map(_parse_tfr_element)
     return dataset.batch(batch_size)
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 166
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 157
 def combine_predictions(
     labels:tf.Tensor,         # Label predictions for a set of 50-mer corresponding to a single k-mer
     label_probs: tf.Tensor,   # Probabilities for the labels
@@ -850,7 +850,7 @@ def combine_predictions(
         combined_pos = counter_pos.most_common(1)[0][0]
         return combined_label, combined_pos
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 167
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 158
 def combine_prediction_batch(
     probs_elements: tuple[tf.Tensor, tf.Tensor]  # Tuple of label and position probabilities for a batch of 50-mer
     ):
@@ -891,7 +891,7 @@ def combine_prediction_batch(
 
     return combined_pred
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 170
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 161
 class DataGenerator_from_50mer(Sequence):
     """data generator for generating batches of data from 50-mers"""
 
@@ -935,7 +935,7 @@ class DataGenerator_from_50mer(Sequence):
         y_pos=to_categorical(y_pos, num_classes=10)
         return x_tensor,{'labels': y_label, 'pos': y_pos}
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 172
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 163
 def get_learning_weights(filepath):
     """get different learning weights for different classes, from file"""
     f = open(filepath,"r").readlines()
