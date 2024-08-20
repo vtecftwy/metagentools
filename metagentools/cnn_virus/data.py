@@ -2,10 +2,11 @@
 
 # %% auto 0
 __all__ = ['CODE_ROOT', 'PACKAGE_ROOT', 'OriginalLabels', 'FastaFileReader', 'FastqFileReader', 'AlnFileReader',
-           'create_infer_ds_from_fastq', 'strings_to_tensors', 'split_kmer_into_50mers', 'base_string_kmers_to_tensors',
-           'split_kmer_batch_into_50mers', 'tfrecord_from_fastq', 'tfrecord_from_text', 'get_dataset_from_tfr',
-           'combine_predictions', 'combine_prediction_batch', 'DataGenerator_from_50mer', 'get_learning_weights',
-           'get_params_50mer', 'get_params_150mer', 'get_kmer_from_50mer', 'get_kmer_from_150mer']
+           'create_infer_ds_from_fastq', 'string_input_batch_to_tensors', 'strings_to_tensors',
+           'split_kmer_batch_into_50mers', 'split_kmer_into_50mers', 'base_string_kmers_to_tensors',
+           'tfrecord_from_fastq', 'tfrecord_from_text', 'get_dataset_from_tfr', 'combine_predictions',
+           'combine_prediction_batch', 'DataGenerator_from_50mer', 'get_learning_weights', 'get_params_50mer',
+           'get_params_150mer', 'get_kmer_from_50mer', 'get_kmer_from_150mer']
 
 # %% ../../nbs-dev/03_cnn_virus_data.ipynb 3
 import collections
@@ -118,7 +119,29 @@ class FastaFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 81
+    def review(self):
+        """Prints the first and last sequences and metadata in the fasta file and returns the nb or sequences"""
+
+        self.reset_iterator()
+        for i, seq in enumerate(self):
+            if i == 0:
+                first_dfn = seq['definition line']
+                first_sequence = seq['sequence'][:80] + ' ...'
+                first_meta = self.parse_text(seq['definition line'])
+        print(f"There {'is' if i == 0 else 'are'} {i+1} sequences in this file")
+        print('\nFirst Sequence:')
+        print(first_dfn)
+        print(first_sequence)
+        print(first_meta)
+        if i != 0:
+            print('\nLast Sequence:')
+            print(seq['definition line'])
+            print(seq['sequence'][:80] + ' ...')
+            print(self.parse_text(seq['definition line']))
+        return i+1
+
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 83
 class FastqFileReader(TextFileBaseReader):
     """Iterator going through a fastq file's sequences and return each section + prob error as a dict"""
     def __init__(
@@ -188,7 +211,7 @@ class FastqFileReader(TextFileBaseReader):
 
         return parsed
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 96
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 98
 class AlnFileReader(TextFileBaseReader):
     """Iterator going through an ALN file"""
     def __init__(
@@ -385,7 +408,23 @@ class AlnFileReader(TextFileBaseReader):
             # We used the iterator, now we need to reset it to make all lines available
             self.reset_iterator()
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 133
+    def cnn_virus_input_generator(
+        self,
+        label:int = 118, # label for this batch (assuming all reads are from the same species)
+        bs:int = 32      # batch size 
+        ):
+        list_of_strings = []
+        for i, chunk in enumerate(self):
+            read_seq = chunk['read_seq_aligned']
+            read_label = label
+            read_pos = self.parse_definition_line_with_position(chunk['definition line'])['read_pos']
+            list_of_strings.append(f"{read_seq}\t{read_label}\t{read_pos}")
+            if i%bs == bs-1:
+                batch = tf.convert_to_tensor(list_of_strings, dtype=tf.string)
+                list_of_strings = []
+                yield batch
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 135
 def create_infer_ds_from_fastq(
     p2fastq: str|Path,             # Path to the fastq file (aln file path is inferred)
     output_dir:str|Path|None=None, # Path to directory where ds file will be saved
@@ -453,18 +492,27 @@ def create_infer_ds_from_fastq(
     
     return p2dataset, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 139
-def strings_to_tensors(
-    b: tf.Tensor        # batch of strings 
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 148
+def string_input_batch_to_tensors(
+    b: tf.Tensor,   # batch of strings representing the inputs (kmer, label, position)
+    k: int = 150    # maximum read length in the batch
     ):
-    """Function converting a batch of bp strings into three tensors: (x_seqs, (y_labels, y_pos))"""
+    """Function converting a batch of bp strings into three tensors: (x_seqs, (y_labels, y_pos))
+
+    Expects input strings to have the format: 'read sequence \t label \t position' where:
+
+    - read sequence: a string of length k (kmer)
+    - label: an integer between 0 and 186 representing the read virus label
+    - position: an integer between 0 and 9 representing the read position in the genome
+    """
     
-    # Split the string in three : returns a ragged tensor which needs to be converted into a normal tensor using .to_tensor()
+    # Split the string in three: 
+    # returns a ragged tensor which needs to be converted into a normal tensor using .to_tensor()
     t = tf.strings.split(b, '\t').to_tensor(default_value = '', shape=[None, 3])
 
     # Split each sequence string into a list of single base strings:
     # 'TCAAAATAATCA' -> ['T','C','A','A','A','A','T','A','A','T','C','A']
-    seqs = tf.strings.bytes_split(t[:, 0]).to_tensor(shape=(None, 50))
+    seqs = tf.strings.bytes_split(t[:, 0]).to_tensor(shape=(None, k))
 
 
     # BHE sequences
@@ -487,7 +535,7 @@ def strings_to_tensors(
     seqs_uint8 = tf.io.decode_raw(seqs, out_type=tf.uint8)
     # note: tf.io.decode_raw adds one dimension at the end in the process
     #       [b'C', b'A', b'T'] will return [[67], [65], [84]] and not [67, 65, 84]
-    #       this is actually what we want to contatenate the values for each base letter
+    #       this is actually what we want to concatenate the values for each base letter
 
     A, C, G, T, N = 65, 67, 71, 84, 78
 
@@ -511,7 +559,49 @@ def strings_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 142
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 156
+def strings_to_tensors(
+    b: tf.Tensor        # batch of strings 
+    ):
+    """Deprecated function, Replace by base_"""
+
+    msg = """
+    `strings_to_tensors` is deprecated. 
+    Use `string_input_batch_to_tensors` instead, with same capabilities and more."""
+
+    raise DeprecationWarning(msg)
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 157
+def split_kmer_batch_into_50mers(
+    kmer: tf.Tensor        # tensor representing a batch of k-mer reads, after base encoding
+    ):
+    """Converts a batch of k-mer reads into several 50-mer reads, by shifting the k-mer one base at a time.
+
+    for a batch of `b` k-mer reads, returns a batch of `b - 49` 50-mer reads
+    """
+    def fn(accumulated, elem):
+        return tf.roll(accumulated, shift=-elem, axis=1)
+
+    b = kmer.shape[0]
+    k = kmer.shape[1]
+    n = k - 49
+
+    # Create a tensor of integers, with a 0 as first element and 1 for all other elements, for shifts
+    shifts = tf.convert_to_tensor([0] + [1] * (n-1))
+
+    # Use tf.scan to shift the original read nb_splits times
+    shifted = tf.scan(fn, shifts, kmer, reverse=False)
+    # print(shifted.shape)
+
+    # de-interlace the 50-reads
+    indices = [(read_nb, batch_nb) for batch_nb in range(b) for read_nb in range(n)]
+    shifted = tf.gather_nd(shifted[:, :, :50, :], indices)
+    # print(shifted.shape)
+    
+    # return shifted[:, :50, :]  # return the tensor with shifted kmer, sliced to only keep 50 bases
+    return shifted  # return the tensor with shifted kmer
+
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 163
 def _bytes_feature(value):
     """Returns a bytes_list from a string / byte."""
     if isinstance(value, type(tf.constant(0))): # if value is tensor
@@ -530,7 +620,7 @@ def _serialize_array(array):
   array = serialize_tensor(array)
   return array
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 143
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 164
 def _base_hot_encode(
     line: str        # one string (one line in text dataset)
     ):
@@ -579,7 +669,7 @@ def _base_hot_encode(
 
     return x_reads, y_labels, y_pos
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 144
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 165
 def split_kmer_into_50mers(
     kmer: tf.Tensor        # tensor representing a single k-mer read, after base
     ):
@@ -597,7 +687,7 @@ def split_kmer_into_50mers(
     shifted = tf.scan(fn, shifts, kmer, reverse=False)
     return shifted[:, :n, :]  # return the tensor with shifted kmer, sliced to only keep 50 bases
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 145
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 166
 def base_string_kmers_to_tensors(
     b: tf.Tensor,   # batch of strings 
     k: int = 50     # maximum read length in the batch
@@ -657,7 +747,7 @@ def base_string_kmers_to_tensors(
 
     return (x_seqs, (y_labels, y_pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 146
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 167
 def split_kmer_batch_into_50mers(
     kmer: tf.Tensor        # tensor representing a batch of k-mer reads, after base encoding
     ):
@@ -687,7 +777,7 @@ def split_kmer_batch_into_50mers(
     # return shifted[:, :50, :]  # return the tensor with shifted kmer, sliced to only keep 50 bases
     return shifted  # return the tensor with shifted kmer, sliced to only keep 50 bases
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 147
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 168
 def tfrecord_from_fastq(
     p2fastq:Path,              # Path to the fastaq file (should be associated with a aln file)
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in saved directory
@@ -753,7 +843,7 @@ def tfrecord_from_fastq(
     
     return p2tfrds, p2metadata, metadata
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 148
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 169
 def tfrecord_from_text(
     p2ds,                      # Path to the text dataset, in the format of original CNN Virus data
     p2tfrds:Path|None=None,    # Path to the TFRecord file, default creates a file in savec directory
@@ -789,7 +879,7 @@ def tfrecord_from_text(
     print(f"Wrote {i+1} reads to TFRecord")
     return p2tfrds
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 149
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 170
 def _parse_tfr_element(element):
     # Define the underlying structure of the data (mirror the dta structure above)
     data = {    
@@ -811,7 +901,7 @@ def _parse_tfr_element(element):
     
     return (read, (label, pos))
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 150
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 171
 def get_dataset_from_tfr(
     p2tfrds:Path,      # Path to the TFRecord dataset
     batch_size:int = 1 # Desired batch side for the dataset
@@ -822,7 +912,7 @@ def get_dataset_from_tfr(
     dataset = dataset.map(_parse_tfr_element)
     return dataset.batch(batch_size)
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 157
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 178
 def combine_predictions(
     labels:tf.Tensor,         # Label predictions for a set of 50-mer corresponding to a single k-mer
     label_probs: tf.Tensor,   # Probabilities for the labels
@@ -850,7 +940,7 @@ def combine_predictions(
         combined_pos = counter_pos.most_common(1)[0][0]
         return combined_label, combined_pos
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 158
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 179
 def combine_prediction_batch(
     probs_elements: tuple[tf.Tensor, tf.Tensor]  # Tuple of label and position probabilities for a batch of 50-mer
     ):
@@ -891,7 +981,7 @@ def combine_prediction_batch(
 
     return combined_pred
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 161
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 182
 class DataGenerator_from_50mer(Sequence):
     """data generator for generating batches of data from 50-mers"""
 
@@ -935,7 +1025,7 @@ class DataGenerator_from_50mer(Sequence):
         y_pos=to_categorical(y_pos, num_classes=10)
         return x_tensor,{'labels': y_label, 'pos': y_pos}
 
-# %% ../../nbs-dev/03_cnn_virus_data.ipynb 163
+# %% ../../nbs-dev/03_cnn_virus_data.ipynb 184
 def get_learning_weights(filepath):
     """get different learning weights for different classes, from file"""
     f = open(filepath,"r").readlines()
