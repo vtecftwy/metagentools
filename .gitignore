@@ -197,3 +197,10 @@ nbs/*/*/reads
 wip.*.ipynb
 nbs/wip.*.ipynb
 nbs/*/wip.*.ipynb
+
+# Any database file with extension .db
+nbs-dev/data_dev/*.db
+nbs-dev/data_dev/*/*.db
+nbs-dev/data_dev/*/*/*.db
+nbs-dev/data_dev/*/*/*/*.db
+
