@@ -198,6 +198,11 @@ wip.*.ipynb
 nbs/wip.*.ipynb
 nbs/*/wip.*.ipynb
 
+# Any html version of notebooks
+nbs/*.html
+nbs/*/*.html
+nbs/*/*/*.html
+
 # Any database file with extension .db
 nbs-dev/data_dev/*.db
 nbs-dev/data_dev/*/*.db
